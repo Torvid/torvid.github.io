@@ -1,0 +1,172 @@
+MainArea
+{
+	display: grid;
+	grid-template-areas:
+		'pad1 titl titl pad2'
+		'pad1 artt descimg pad2'
+		'pad1 artt desc pad2'
+		'pad1 down desc pad2'
+		'pad1 cred desc pad2';
+	
+	grid-template-columns: 1fr 3fr 1.5fr 1fr;
+}
+@media only screen and (max-width: 75em)
+{
+	MainArea
+	{
+		grid-template-areas:
+			'titl titl'
+			'artt descimg'
+			'artt desc'
+			'down desc'
+			'cred desc';
+		grid-template-columns:3fr 1.5fr;
+	}
+}
+
+@media only screen and (max-width: 40em)
+{
+	MainArea
+	{
+		grid-template-areas:
+			'titl'
+			'artt'
+			'descimg'
+			'desc'
+			'down'
+			'cred';
+		grid-template-columns: 1fr;
+	}
+}
+
+@media only screen and (hover: none) and (pointer: coarse)
+{
+	MainArea
+	{
+		grid-template-areas:
+			'titl'
+			'artt'
+			'descimg'
+			'desc'
+			'down'
+			'cred';
+		grid-template-columns: 1fr;
+	}
+}
+
+.grid-item {
+  padding: 5px 5px;
+}
+
+.DownloadIcon {
+	/*margin: auto;*/
+	width:20px;
+	height:20px;
+	padding: 5px 5px;
+}
+
+.DownloadText {
+	margin: auto;
+}
+
+.DownloadButton {
+	display:flex;
+	width:22em;
+	border-radius:1em;
+}
+
+.DownloadButtonText {
+	text-align: center;
+	width:22em;
+	height:0em;
+}
+
+.ArtAreaImage {
+	width:30%;
+	aspect-ratio:1.77777;
+	object-fit: cover;
+	cursor: pointer;
+	margin: 2px 2px;
+}
+
+.GalleryMain {
+	width:100%;
+	aspect-ratio:1.77777;
+	object-fit: cover;
+}
+
+TitleArea
+{
+  grid-area: titl;
+  padding: 10px 10px;
+}
+
+DescriptionArea
+{
+	grid-area: desc;
+	padding: 10px 10px;
+}
+
+DescriptionAreaImage
+{
+	grid-area: descimg;
+	padding: 10px 10px;
+}
+
+ArtArea
+{
+	grid-area: artt;
+	padding: 10px 10px;
+}
+
+ArtAreaMainImage
+{
+	cursor: pointer;
+}
+
+.ArtAreaSelector
+{
+	overflow-x:scroll;
+	white-space: nowrap;
+}
+
+CreditsArea
+{
+  grid-area: cred;
+  padding: 10px 10px;
+}
+
+DownloadArea
+{
+  grid-area: down;
+  padding: 10px 10px;
+}
+
+PaddingArea1
+{
+  grid-area: pad1;
+  padding: 10px 10px;
+}
+
+PaddingArea2
+{
+  grid-area: pad2;
+  padding: 10px 10px;
+}
+
+
+.lightboximage
+{
+  width: 98%;
+  margin:auto;
+}
+.lightbox
+{
+  display:flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+}

@@ -1,0 +1,209 @@
+<style>
+body {
+    font: normal 50px Verdana, Arial, sans-serif;
+}
+TD{font: normal 50px Verdana, Arial, sans-serif;}
+button{font: normal 50px Verdana, Arial, sans-serif;}
+</style>
+
+<body>
+
+<div id="FPS"> </div>
+<div id="Time"> </div>
+<br/>
+<!--<div id="Mass"> </div>-->
+<div id="Energy"> </div>
+<br/>
+<!--<div id="Mass /s"> </div>-->
+<div id="Energy IN"> </div>
+<div id="Energy OUT"> </div>
+<br/>
+
+
+<table><tr><td>
+    
+    <div><b>Energy Generator</b></div>
+    <div>Build Time: 5 seconds</div>
+    <div>Energy Cost: 100</div>
+    <!--<div>Mass Cost: 100</div>-->
+    <div>Energy /s: 50</div>
+    <button onclick="BuildEnergyGenerator()">Build</button><br/><br/>
+<!--
+</td><td>
+
+    <div><b>Mass Extractor</b></div>
+    <div>Build Time: 5 seconds</div>
+    <div>Energy Cost: 100</div>
+    <div>Mass Cost: 100</div>
+    <div>Mass /s: 50</div>
+    <button onclick="BuildMassGenerator()">Build</button><br/><br/>
+-->
+</td><td>
+
+    <div><b>Energy storage</b></div>
+    <div>Build Time: 5 seconds</div>
+    <div>Energy Cost: 100</div>
+    <!--<div>Mass Cost: 100</div>-->
+    <div>Energy Storage: 100</div>
+    <button onclick="BuildEnergyStorage()">Build</button><br/><br/>
+<!--
+</td><td>
+
+    <div><b>Mass Storage</b></div>
+    <div>Build Time: 5 seconds</div>
+    <div>Energy Cost: 100</div>
+    <div>Mass Cost: 100</div>
+    <div>Mass Storage: 100</div>
+    <button onclick="BuildMassStorage()">Build</button><br/><br/>
+-->
+</td></tr></table>
+
+<div id="debug"> </div>
+</body>
+<script>
+
+    //class BuildingInfo
+    //{
+    //	constructor(height, width)
+    //	{
+    //	this.height = height;
+    //	this.width = width;
+    //	}
+    //}
+    BuildingInfoNames = ["Generator", "Extractor", "Energy Storage", "Mass Storage"]
+    BuildingInfoBuildTime = [5, 5, 5, 5]
+    BuildingInfoEnergyCost = [100, 100, 100, 100]
+    BuildingInfoMassCost = [100, 100, 100, 100]
+
+    function BuildEnergyGenerator()
+    {
+        BuildingsCtrTimes.push(0.0)
+        BuildingsCtrIndex.push(0)
+    }
+    //function BuildMassGenerator()
+    //{
+    //	BuildingsCtrTimes.push(0.0)
+    //	BuildingsCtrIndex.push(1)
+    //}
+    function BuildEnergyStorage()
+    {
+        BuildingsCtrTimes.push(0.0)
+        BuildingsCtrIndex.push(2)
+    }
+    //function BuildMassStorage()
+    //{
+    //	BuildingsCtrTimes.push(0.0)
+    //	BuildingsCtrIndex.push(3)
+    //}
+    
+    //Mass = 500;
+    Energy = 500;
+    //MaxMass = 500;
+    MaxEnergy = 500;
+    
+    //MassPerSecond = 50;
+    EnergyPerSecond = 50;
+    
+    BuildingsCtrTimes = []
+    BuildingsCtrIndex = []
+    
+    Time = 0.0
+    function clamp(x, min, max)
+    {
+        return Math.min(Math.max(x, min), max);
+    }
+    function round2(x)
+    {
+        return Math.round(x * 100) / 100
+    }
+    function round(x)
+    {
+        return Math.round(x)
+    }
+    function Set(name, value)
+    {
+        document.getElementById(name).innerHTML = (name + ": " + value)
+    }
+    
+    function update(DeltaTime)
+    {
+        // Engine
+        FPS = 1.0 / DeltaTime
+        Time += DeltaTime
+        
+        // Application
+        //Mass += MassPerSecond * DeltaTime;
+        Energy += EnergyPerSecond * DeltaTime;
+        
+        // Figure out how much energy we need to expend per second
+        RequiredEnergy = 0;
+        for (i = 0; i < BuildingsCtrIndex.length; i++)
+        {
+            j = BuildingsCtrIndex[i];
+            EnergyCostPerSecond = (BuildingInfoEnergyCost[j] / BuildingInfoBuildTime[j])
+            RequiredEnergy += EnergyCostPerSecond
+        }
+        
+        if(Energy > (RequiredEnergy * DeltaTime)) // If we have enough energy to feed every single thing we are buidling
+        {
+            Energy -= (RequiredEnergy * DeltaTime)
+            for (i = 0; i < BuildingsCtrIndex.length; i++)
+            {
+                BuildingsCtrTimes[i] += DeltaTime;
+                j = BuildingsCtrIndex[i];
+                if(BuildingsCtrTimes[i] >= BuildingInfoBuildTime[j]) // some energy is lost here from overshooting time.
+                {
+                    BuildingsCtrTimes.splice(i, 1)
+                    BuildingsCtrIndex.splice(i, 1)
+                    if(j == 0) // Generator
+                    {
+                        EnergyPerSecond += 50;
+                    }
+                    if(j == 2) // Storage
+                    {
+                        MaxEnergy += 100;
+                    }
+                    i--
+                    continue;
+                }
+            }
+        }
+        
+        // Fixup
+        //Mass = clamp(Mass, 0, MaxMass);
+        Energy = clamp(Energy, 0, MaxEnergy);
+        document.getElementById("debug").innerHTML = ""
+        
+        for (i = 0; i < BuildingsCtrIndex.length; i++)
+        {
+            j = BuildingsCtrIndex[i];
+            
+            document.getElementById("debug").innerHTML += BuildingInfoNames[j] + ": " + round((BuildingsCtrTimes[i] / BuildingInfoBuildTime[j]) * 100) + "%"
+            document.getElementById("debug").innerHTML += "<br/>"
+        }
+        // Draw
+        //Set("debug", BuildingsCtrTimes)
+        Set("FPS", round(FPS))
+        Set("Time", round2(Time))
+        //Set("Mass", round(Mass)+" / "+round(MaxMass))
+        Set("Energy", round(Energy)+" / "+round(MaxEnergy))
+        //Set("Mass /s", MassPerSecond)
+        Set("Energy IN", EnergyPerSecond + " /s")
+        Set("Energy OUT", RequiredEnergy + " /s")
+        
+    }
+
+    function loop(timestamp)
+    {
+      var progress = timestamp - lastRender
+
+      update(progress / 1000.0)
+
+      lastRender = timestamp
+      window.requestAnimationFrame(loop)
+    }
+    var lastRender = 0
+    window.requestAnimationFrame(loop)
+
+
+</script>

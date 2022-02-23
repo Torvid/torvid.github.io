@@ -1,0 +1,138 @@
+
+<link rel="stylesheet" href="../styles.css">
+					
+<h1>C programming experiments.</h1>
+<h3>Targeting WASM & Win32. No engine. No libraries.</h3>
+
+<!-- (no, not even the C standard library.) <h6>(other than math.h on win32 and some js math functions in WASM. The performance would be crippeled if I tried implementing the raw math functions myself >.>)</h6></h3>-->
+<br/>
+<br/>
+<br/>2021-06-9, reading user input such as mouse cursor, gamepad, keyboard.
+<br/><a href="/wasm/input/">input<a/>
+<br/>
+<br/>2021-06-12, drawing images, filtered and not filtered as well as gamma-correct(ish) transparency.
+<br/><a href="/wasm/images/">images<a/>
+<br/>
+<br/>2021-06-20, ray-box intersection in 2D
+<br/><a href="/wasm/raybox/">raybox<a/>
+<br/>
+<br/>2021-06-20, ray-box intersection in 3D with texture mapping
+<br/><a href="/wasm/texturecube/">texturecube<a/>
+<br/>
+<br/>2021-06-27, depth buffer, 3d transforms for rotaton, camera projection and some optimizations. (still pretty slow tho)
+<br/><a href="/wasm/cubescene/">cubescene<a/>
+<br/>
+<br/>2021-07-11, ray-sphere intersection, simple lighting, some optimizations, better bounding boxes and faster loop.
+<br/><a href="/wasm/spherescene/">spherescene<a/>
+<br/>
+<br/>2021-07-11, skybox and more elaborate lighting.
+<br/><a href="/wasm/spherescenelighting/">spherescenelighting<a/>
+<br/>
+<br/>2021-07-13, circle-box de-intersection and physics with angular momentum.
+<br/><a href="/wasm/physics2d/">physics2d<a/>
+<br/>
+<br/>2021-07-15, extended the physics thing to 3d. Not claiming it's good, stable or even fast. Janky physics, but it's *my* janky physics. :)
+<br/><a href="/wasm/physics3d/">physics3d<a/>
+<br/>
+<br/>2021-07-20, If there's any aspect of this that I still feel uncomfortable with, it's definitely threading. I'd love to keep going but it's eaten three days already, so this is where it's at. Need to focus on other things for now.
+<br/><a href="/wasm/threading/">threading<a/>
+<br/>
+<br/>2021-07-22, added editor features such as a gizmo, loading/saving of levels, persistent state (If you refresh, the camera stays in place), some more UI stuff like a slider.
+<br/><a href="/wasm/editor/">editor<a/>
+<br/>
+<br/>2021-07-24, added sound, both playback from files and ported over my string synth from last year.
+<br/><a href="/wasm/sound/">sound<a/>
+<br/>
+<br/>2021-07-26, Particle effects! not super much to say about them, just drawing images with a simple determinstic sim.
+<br/><a href="/wasm/effects/">effects<a/>
+<br/>
+<br/>2022-01-28, After a several month hiatus, and kind of getting burned out on making multithreading work, with a lot of help from a friend (doublescale) It now seems to work pretty reliably, both on windows and in this web version. As well as threaded rendering now working, this version also has some gameplay stuff! (gameply ideas shamelessly stolen from an old favourite game of mine called Ballance.)
+<br/><a href="/wasm/gameplay/">gameplay<a/>
+<br/>
+
+<!--
+<br/>2022-01-28, After a couple months, I've taken this project up again. Starting with showing off some performance/profiling work. Here are some performance numbers:
+<br/>CPU: AMD Ryzen 7 1800X, Everything was compiled with Clang.
+<br/>Windows, single-threaded, 960x540: ~16 ms (60 fps)
+<br/>Windows, single-threaded, 1920x1080: ~40ms
+<br/>Windows, single-threaded, 3840x2160: ~150ms
+<br/>Windows, threaded, 960x540: ~1.5ms (60 fps)
+<br/>Windows, threaded, 1920x1080: ~5ms
+<br/>Windows, threaded, 3840x2160: ~21ms
+<br/>WASM, clang, google chrome, 960x540:
+-->
+
+<br/>
+<br/><b>Todo</b>
+<br/><s>memory
+<br/>blitting
+<br/>user input
+<br/>math
+<br/>image loading
+<br/>raycasting box
+<br/>raycasting sphere
+<br/>physics
+<br/>persistent data
+<br/>multithreaded rendering
+<br/>level saving
+<br/>level editing
+<br/>sound
+<br/>particle effects</s>
+<br/>Cleanup
+<br/>Performance
+<br/>Game
+<br/>Performance
+<br/>
+<br/>Networking? (winsock/web sockets?)
+<br/>Go through all the code, rename structs to use consistent naming, merge all X, Y stuff into float2/flaot3s.
+<br/>
+<br/> Maybe write an image loader so I don't have to read from a canvas. for security reasons some people disable canvas reading.
+<br/> If you have problems with textures looking broken, allow the page to read from canvas. https://i.imgur.com/HsL2mOi.png
+<br/>
+<br/>Physics!
+<br/>de-intersection
+<br/>thing put into motion tends to stay in motion.
+<br/>gravity
+<br/>rotation energy -> movement energy, movement energy -> rotation energy
+<br/>
+<br/> Level saving!
+<br/> generate C files that contain the entity data, include them? hacky, but will work everywhere. won't work if level data becomes too big.
+<br/> make a level file, "level1.c" that has a function that calls a bunch of functons to spawn stuff.
+<br/> makeBox(pos, rot, scale, mat)
+<br/> makeSpawn(pos)
+<br/> makeGoal(pos)
+<br/> makeSphere(pos)
+<br/>
+<br/>mechanics
+<br/>switching balls
+<br/>rolling against walls
+<br/>
+<br/>enitites
+<br/>	block
+<br/>	ball
+<br/>	player
+<br/>	checkpoint
+<br/>	spawn
+<br/>	end
+<br/>	extra time pickup
+<br/>	gong
+<br/>	health pickup
+<br/>	statically movable object
+	
+	platform spiral
+linus on the line
+slalom
+wavy platform momentum
+side rolling
+
+grid platform
+
+
+rolling balls down to roll over
+
+rolling track staircase
+
+rolling onto side-rolling
+
+
+rails

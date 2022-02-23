@@ -1,0 +1,10 @@
+@echo off
+
+set /a stack_size=1*1024*1024 REM 1MB Stack size
+set /a mem_size=128*1024*1024 REM 128MB of memory avilable in total
+
+REM clang -Ofast -nostdlib -mbulk-memory --target=wasm32 -Wl,--no-entry,--initial-memory=%mem_size%,-z,stack-size=%stack_size%,-allow-undefined-file=wasm.syms,--export-all,-O3 -o web.wasm web.cpp
+REM clang -Ofast -nostdlib -mbulk-memory --target=wasm32 -Wl,--no-entry -Wl,--initial-memory=%mem_size% -Wl,-z,stack-size=%stack_size% -Wl,-allow-undefined-file=wasm.syms -Wl,--export-all -Wl,-O3 -o web.wasm web.cpp
+
+clang -Ofast -nostdlib -mbulk-memory --target=wasm32 -Wl,--no-entry -Wl,--shared-memory -Wl,--no-check-features -Wl,--import-memory -Wl,--max-memory=%mem_size% -Wl,--initial-memory=%mem_size% -Wl,-z,stack-size=%stack_size% -Wl,-allow-undefined-file=wasm.syms -Wl,--export-all -Wl,-O3 -o web.wasm web.cpp
+REM clang -nostdlib -mbulk-memory --target=wasm32 -Wl,--no-entry -Wl,--shared-memory -Wl,--no-check-features -Wl,--import-memory -Wl,--max-memory=%mem_size% -Wl,--initial-memory=%mem_size% -Wl,-z,stack-size=%stack_size% -Wl,-allow-undefined-file=wasm.syms -Wl,--export-all -Wl,-O3 -o web.wasm web.cpp

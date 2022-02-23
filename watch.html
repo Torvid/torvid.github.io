@@ -1,0 +1,208 @@
+
+<style>
+BODY
+{
+	background-color:#000000;
+	/*too awesome for this world:
+	animation: rainbow-bg 5s linear infinite;*/
+	font-family:Verdana;
+	font-weight:normal;
+	font-size: 10pt;
+	color:#FF0000;
+	margin: auto
+}
+p
+{
+	max-width: 1000px;
+	margin: auto;
+	font-size: large;
+}
+</style>
+					
+<video id="video" width=100%  controls>
+  <source id="videosource" src="" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+
+
+<p id="debug"> hello </p>
+<!--
+<button onclick="Play()">Play</button>
+<button onclick="Pause()">Pause</button>
+<button onclick="Test2()">Test2</button>
+-->
+
+<input id="host" type="checkbox">Host</input>
+
+
+<script>
+
+video = document.getElementById("video")
+videosource = document.getElementById("videosource")
+host = document.getElementById("host")
+
+debug = document.getElementById("debug")
+debug.innerHTML = "aaa"
+
+NUMBERSERVER = "http://212.100.102.124:31337/"
+VIDEOPATH = "http://torvid.pw/share/moobers/video.mp4"
+
+
+videosource.setAttribute('src', VIDEOPATH); 
+video.load();
+
+
+PlayFromScript = false;
+PauseFromScript = false;
+ServerPaused = false;
+
+UserPlaying = false;
+
+video.onseeked = function()
+{
+    console.log("seek");
+    SetServerTime()
+}
+video.onpause = function()
+{
+    console.log("pause");
+	if(PauseFromScript)
+	{
+		PauseFromScript = false;
+		return;
+	}
+	UserPlaying = false;
+	SetServerTime()
+}
+video.onplay = function()
+{
+    console.log("play");
+	if(PlayFromScript)
+	{
+		PlayFromScript = false;
+		return;
+	}
+	UserPlaying = true;
+    SetServerTime()
+    if(ServerPaused)
+    {
+		PauseFromScript = true;
+    	video.pause();
+    }
+}
+
+
+function SetServerTime()
+{
+	if(!host.checked)
+	    return;
+    
+    NewTime = 0;
+
+    if(video.paused)
+        NewTime = -video.currentTime;
+	else
+        NewTime = video.currentTime;
+
+	const Http = new XMLHttpRequest();
+	const url = NUMBERSERVER + Math.floor(NewTime);
+	Http.open("GET", url);
+	Http.send();
+}
+
+function GetServerTime(callback)
+{
+	const Http = new XMLHttpRequest();
+	const url = NUMBERSERVER;
+	Http.open("GET", url);
+	Http.send();
+
+	Http.onreadystatechange = (e) =>
+	{
+		time = parseInt(Http.responseText)
+
+		if(Number.isNaN(time))
+		    return;
+
+		realtime = Math.abs(time)
+		paused = time < 0;
+        callback(realtime, !paused);
+	}
+}
+
+setInterval(timer, 2000)
+
+function Play()
+{
+	if(UserPlaying)
+	{
+		if(video.paused)
+		{
+		    ServerPaused = false;
+		    PlayFromScript = true;
+		    video.play();
+		}
+	}
+}
+function Pause()
+{
+	if(!video.paused)
+	{
+		ServerPaused = true;
+	    PauseFromScript = true;
+	    video.pause();
+	}
+}
+_ServerTime = 0;
+_ServerPlaying = false;
+
+function timer()
+{
+    if(host.checked)
+    {
+		SetServerTime()
+    }
+    else
+    {
+    	GetServerTime(function(ServerTime, ServerPlaying)
+		{
+			_ServerTime = ServerTime;
+			_ServerPlaying = ServerPlaying;
+			if(UserPlaying) // paused
+			{
+				if(ServerPlaying)
+				{
+                    // If we are 5 seconds or more away from the server, move the time.
+					timedistance = Math.abs(ServerTime - Math.floor(video.currentTime));
+					if(timedistance > 5)
+					{
+						video.currentTime = ServerTime;
+					}
+					Play()
+				}
+				else
+				{
+					Pause();
+					video.currentTime = ServerTime;
+				}
+			}
+			else
+			{
+	            video.pause();
+			}
+		})
+    }
+}
+
+function tick()
+{
+	debug.innerHTML = "";
+	debug.innerHTML += "ServerPlaying: " + _ServerPlaying + "<br/>";
+	debug.innerHTML += "UserPlaying: " + UserPlaying + "<br/>";
+	debug.innerHTML += "ServerTime: " + _ServerTime + "<br/>";
+	debug.innerHTML += "UserTime: " + Math.floor(video.currentTime) + "<br/>";
+	window.requestAnimationFrame(tick)
+}
+window.requestAnimationFrame(tick)
+
+</script>

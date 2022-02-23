@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+                <head>
+                    <title>Torvid</title>
+                    <meta property="og:image" content="http://www.torvid.pw/favicon.jpg" />
+                    <meta property="og:title" content="Mag squeeze" />
+                    <meta property="og:site_name" content="torvid.net" />
+                    <meta property="og:description" content="Torvid getting himself squeezed and filled." />
+
+                    <link rel="shortcut icon" href="/favicon.jpg" />
+                    <link rel="stylesheet" href="/styles.css">
+
+
+                    <!-- Global site tag (gtag.js) - Google Analytics -->
+                    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-61846769-2"></script>
+                    <script>
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+
+                      gtag('config', 'UA-61846769-2');
+                    </script>
+
+
+                </head>
+                <!--<script src="/functions.js"></script>-->
+                <body bgcolor="black">
+
+
+        
+                <CustomCenter>
+                    <!--<p>pw.torvid.vore<p>-->
+                    <h1>torvid.net</h1>
+                    &nbsp;<a href="/home" id = "MainLink">Home</a>&nbsp;
+                    &nbsp;<a href="/gallery" id = "ImagesLink">Gallery / Misc</a>&nbsp;
+                    &nbsp;<a href="/commissions" id = "commissionsLink">Commissions / Gifts</a>&nbsp;
+                    <br/>
+                    <br/>
+                </CustomCenter>
+            <hr/>
+            
+
+<script>
+
+	image = "/content/magsqueeze/2020_12_07_torvidcomm_WS_noleak_nopp.jpg";
+	UpdateImage = function () {
+		img_fill = "/content/magsqueeze/2020_12_07_torvidcomm_WS_noleak_nopp.jpg"
+		img_fill_pp = "/content/magsqueeze/2020_12_07_torvidcomm_WS_noleak_pp.jpg"
+		img_fill_ws = "/content/magsqueeze/2020_12_07_torvidcomm_WS_nopp.jpg"
+		img_fill_ws_pp = "/content/magsqueeze/2020_12_07_torvidcomm_WS_pp.jpg"
+		img_fill_spoo = "/content/magsqueeze/2020_12_07_torvidcomm_WS_spooleak_nopp.jpg"
+		img_fill_spoo_pp = "/content/magsqueeze/2020_12_07_torvidcomm_WS_spooleak_pp.jpg"
+		img_cronch = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_nopp_notext.jpg"
+		img_cronch_pp = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_pp_notext.jpg"
+		img_cronch_ws = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_nopp_piss_notext.jpg"
+		img_cronch_ws_pp = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_pp_piss_notext.jpg"
+		img_cronch_text = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_nopp_text.jpg"
+		img_cronch_text_pp = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_pp_text.jpg"
+		img_cronch_text_ws = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_nopp_piss_text.jpg"
+		img_cronch_text_ws_pp = "/content/magsqueeze/2020_12_07_torvidcomm_cronch_pp_piss_text.jpg"
+
+		// Alt
+		Fill = document.getElementById("Fill")
+		Cronch = document.getElementById("Cronch")
+		// Fluid
+		Nothing = document.getElementById("Nothing")
+		Piss = document.getElementById("Piss")
+		Cum = document.getElementById("Cum")
+
+		// Options
+		TorvidPP = document.getElementById("TorvidPP")
+		Text = document.getElementById("Text")
+
+		//alert("Fill: " + Fill + "\n" +
+		//	  "Watersports: " + Watersports + "\n" +
+		//	  "Cronch: " + Cronch + "\n" +
+		//	  "TorvidPP: " + TorvidPP + "\n" +
+		//	  "Text: " + Text + "\n");
+
+		Text.disabled = false
+		Fill.disabled = false
+		Cronch.disabled = false
+		Nothing.disabled = false
+		Piss.disabled = false
+		Cum.disabled = false
+		TorvidPP.disabled = false
+		Text.disabled = false
+
+		TorvidPP.innerHTML = "<strike>" + TorvidPP.innerHTML + "</strike>"
+
+		document.getElementById("LabelText").style = ""
+		document.getElementById("LabelCum").style = ""
+		if (Fill.checked) {
+			Text.disabled = true
+			document.getElementById("LabelText").style = "text-decoration: line-through;"
+		}
+		if (Cronch.checked) {
+			Cum.disabled = true
+			document.getElementById("LabelCum").style = "text-decoration: line-through;"
+			if (Cum.checked) {
+				Cum.checked = false
+				Nothing.checked = true
+			}
+		}
+
+		if (Fill.checked) {
+			if (Nothing.checked) {
+				if (TorvidPP.checked)
+					image = img_fill_pp
+				else
+					image = img_fill
+
+			}
+			else if (Piss.checked) {
+				if (TorvidPP.checked)
+					image = img_fill_ws_pp
+				else
+					image = img_fill_ws
+
+			}
+			else if (Cum.checked) {
+				if (TorvidPP.checked)
+					image = img_fill_spoo_pp
+				else
+					image = img_fill_spoo
+			}
+		}
+		else if (Cronch.checked) {
+			if (Nothing.checked) {
+				if (TorvidPP.checked) {
+					if (Text.checked)
+						image = img_cronch_text_pp
+					else
+						image = img_cronch_pp
+				}
+				else {
+					if (Text.checked)
+						image = img_cronch_text
+					else
+						image = img_cronch
+				}
+			}
+			else if (Piss.checked) {
+				if (TorvidPP.checked) {
+					if (Text.checked)
+						image = img_cronch_text_ws_pp
+					else
+						image = img_cronch_ws_pp
+				}
+				else {
+					if (Text.checked)
+						image = img_cronch_text_ws
+					else
+						image = img_cronch_ws
+				}
+			}
+		}
+		document.getElementById("myImage").src = image
+
+	}
+</script>
+
+<center>
+
+	<table style="width:25%">
+		<tr>
+			<th>Alt</th>
+			<th>Options</th>
+			<th>Fluid</th>
+		</tr>
+		<tr>
+			<td>
+				<input id="Fill" name="alt" type="radio" onchange="UpdateImage()" checked="checked"></input>
+				Fill
+			</td>
+			<td>
+				<input id="TorvidPP" type="checkbox" onchange="UpdateImage()" checked="checked"></input>
+				Torvid PP
+			</td>
+			<td>
+				<input id="Nothing" name="fluid" type="radio" onchange="UpdateImage()" checked="checked"></input>
+				Nothing
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input id="Cronch" name="alt" type="radio" id="female" onchange="UpdateImage()"></input>
+				Cronch
+			</td>
+			<td>
+				<strike><input id="Text" type="checkbox" onchange="UpdateImage()" checked="checked"></input></strike>
+				<label id="LabelText">Text</label>
+			</td>
+			<td>
+				<input id="Piss" name="fluid" type="radio" onchange="UpdateImage()"></input>
+				Piss
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td>
+				<input id="Cum" name="fluid" type="radio" onchange="UpdateImage()"></input>
+				<label id="LabelCum">Spoo</label>
+			</td>
+		</tr>
+	</table>
+	<br />
+	<img id="myImage" src="/content/magsqueeze/2020_12_07_torvidcomm_WS_noleak_nopp.jpg" style="height:50%">
+
+</center>
+
+<script>
+	UpdateImage();
+</script>
+
+
+</body> 
+            </html>
