@@ -1,0 +1,17 @@
+print_num
+PlatformPrint
+PlatformTime
+sqrtf
+floorf
+ceilf
+sinf
+cosf
+atan2
+log10
+fabsf
+pow
+fminf
+fmaxf
+roundf
+exp2f
+LoadFileIntoCanvas

@@ -1,0 +1,3 @@
+MakeEntity(gameState, &gameState->Entities[0], transform(float3_coerce(1082614701, -1055941952, 0), float3_coerce(0, 1065353216, 0), float3_coerce(0, 0, 1065353216), float3_coerce(1065353216, 1065353216, 1065353216)), 1, 1, 1, 1, 0, 0, 0, 0);
+MakeEntity(gameState, &gameState->Entities[1], transform(float3_coerce(1072520065, 1075483797, 1040720258), float3_coerce(0, -1086811672, 1060201933), float3_coerce(0, -1087281715, -1086811672), float3_coerce(1065353216, 1065353216, 1065353216)), 1, 1, 1, 1, 0, 0, 0, 0);
+MakeEntity(gameState, &gameState->Entities[2], transform(float3_coerce(-1077356893, 1082525944, 1067072995), float3_coerce(1060807749, 1060058996, 0), float3_coerce(0, 0, 1065353216), float3_coerce(1081614436, 1080453661, 1065353216)), 1, 1, 1, 1, 3, 0, 0, 0);

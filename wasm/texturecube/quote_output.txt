@@ -1,0 +1,3 @@
+Compiling quote.cpp into quote.dll 
+quote.cpp
+C:\Users\paima\Dropbox\Shared\Webserver\bin\vore.torvid.pw\website\content\wasm\texturecube\intrinsics.cpp(20): fatal error C1034: math.h: no include path set

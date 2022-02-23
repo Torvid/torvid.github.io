@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<link rel="icon" type="image/png" href="/content/wasm/favicon.png" />
+<link rel="icon" type="image/png" href="favicon.png" />
+
+<style>
+    html, body, div, canvas {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<title>Thingy Web</title>
+
+<canvas id=DrawingCanvas>
+</canvas>
+
+This is a website, yes
+
+<script>
+
+    var interval;
+
+
+    window.addEventListener("keydown", function (e) {
+        if (e.repeat) return
+        global_exports.KeyDown(e.keyCode);
+    }, true);
+    window.addEventListener("keyup", function (e) {
+        if (e.repeat) return
+        global_exports.KeyUp(e.keyCode);
+    }, true);
+
+    window.addEventListener("mousedown", function (e) {
+        global_exports.MouseDown(e.which - 1)
+    }, true);
+
+    window.addEventListener("mouseup", function (e) {
+        global_exports.MouseUp(e.which - 1)
+    }, true);
+
+    document.onmousemove = function (e) {
+        global_exports.MouseMove(e.clientX, e.clientY);
+    }
+    window.addEventListener("wheel", function (e) {
+        global_exports.MouseScroll(e.wheelDeltaY / 120);
+    }, true);
+
+    function LoadFileIntoCanvas(Destination, Filename) {
+        Filepath = CStringToJsString(Filename).replace(".tga", ".png");
+
+        var img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = Filepath;
+        img.onload = function () {
+
+            //var ImageCanvas = document.body.appendChild(canvas);
+            var ImageCanvas = document.createElement('canvas');
+            document.body.appendChild(ImageCanvas);
+            //var ImageCanvas = document.getElementById('ImageCanvas');
+            ImageCanvas.width = img.width
+            ImageCanvas.height = img.height
+            var context = ImageCanvas.getContext('2d');
+            context.drawImage(img, 0, 0);
+            img.style.display = 'none';
+            //console.log(Destination)
+            data = context.getImageData(0, 0, img.width, img.height);
+            for (i = 0; i < data.data.length; i++) {
+                memory[Destination + i] = data.data[i];
+            }
+        };
+
+        console.log("Trying to read: " + CStringToJsString(Filename));
+        return true;
+    }
+
+    function PlatformPrint(n) {
+        console.log(CStringToJsString(n))
+    }
+    function print_num(n) {
+        console.log(n)
+    }
+
+    function CStringToJsString(n) {
+        // n is a pointer to the string
+        // Strings are null-terminated, so read characters untill we hit a 0.
+        // Stop at 200 if the string is too long.
+        // This should probably be changed to also take a length value for memory-safety reasons?
+
+        result = ""
+        for (i = 0; i < 200; i++) {
+            if (memory[n + i] == 0)
+                break
+            result += String.fromCharCode(memory[n + i]);
+        }
+        return result
+    }
+
+
+    var canvas = document.getElementById('DrawingCanvas');
+    // Disable right-click on canvas
+    canvas.addEventListener('contextmenu', function (e) {
+        if (e.button == 2) {
+            // Block right-click menu thru preventing default action.
+            e.preventDefault();
+        }
+    });
+
+    var ctx = canvas.getContext('2d');
+
+    var global_exports = false
+    var global_exports_loaded = false
+    var width = 0
+    var height = 0
+    var ImageData = 0
+    var memory = 0
+
+    async function init() {
+        let imports = {};
+        imports['LoadFileIntoCanvas'] = LoadFileIntoCanvas
+        imports['PlatformPrint'] = PlatformPrint
+        imports['print_num'] = print_num
+        imports['sqrtf'] = function (a) { return Math.sqrtf(a) }
+        imports['floorf'] = function (a) { return Math.floor(a) }
+        imports['ceilf'] = function (a) { return Math.ceil(a) }
+        imports['sinf'] = function (a) { return Math.sin(a) }
+        imports['cosf'] = function (a) { return Math.cos(a) }
+        imports['atan2'] = function (a, b) { return Math.atan2(a, b) }
+        imports['log10'] = function (a) { return Math.log10(a) }
+        imports['fabsf'] = function (a) { return Math.abs(a) }
+        imports['pow'] = function (a, b) { return Math.pow(a) }
+        imports['fminf'] = function (a, b) { return Math.min(a, b) }
+        imports['fmaxf'] = function (a, b) { return Math.max(a, b) }
+        imports['roundf'] = function (a) { return Math.round(a) }
+        imports['exp2f'] = function (a) { return Math.exp(a) }
+
+
+        const { instance } = await WebAssembly.instantiateStreaming(fetch("web.wasm"), { "env": imports });
+
+        // Alternate way of loading wasm that works even if the webserver doesn't support wasm files.
+        //const response = await fetch("web.wasm");
+        //const buffer = await response.arrayBuffer();
+        //const obj = await WebAssembly.instantiate(buffer, { "env": imports });
+        //instance = obj.instance;
+
+
+        global_exports = instance.exports;
+        global_exports_loaded = true;
+        reportWindowSize();
+    }
+    init();
+
+    reportWindowSize();
+
+    function loop(timestamp) {
+        if (global_exports_loaded) {
+            //time_start = performance.now()
+
+            gamepads = navigator.getGamepads()
+            for (var i = 0; i < 4; i++) {
+                if (gamepads[i]) {
+                    X = gamepads[i].buttons[2].pressed;
+                    Y = gamepads[i].buttons[3].pressed;
+                    A = gamepads[i].buttons[0].pressed;
+                    B = gamepads[i].buttons[1].pressed;
+
+                    LeftBumper = gamepads[i].buttons[4].pressed;
+                    RightBumper = gamepads[i].buttons[5].pressed;
+                    LeftTrigger = gamepads[i].buttons[6].pressed;
+                    RightTrigger = gamepads[i].buttons[7].pressed;
+
+                    Up = gamepads[i].buttons[12].pressed;
+                    Down = gamepads[i].buttons[15].pressed;
+                    Left = gamepads[i].buttons[13].pressed;
+                    Right = gamepads[i].buttons[14].pressed;
+
+                    Start = gamepads[i].buttons[8].pressed;
+                    Back = gamepads[i].buttons[9].pressed;
+
+                    LeftStickX = gamepads[i].axes[0];
+                    LeftStickY = gamepads[i].axes[1];
+                    RightStickX = gamepads[i].axes[2];
+                    RightStickY = gamepads[i].axes[3];
+
+
+                    global_exports.UpdateGamepad(i,
+                        X, Y, A, B,
+                        Up, Down, Left, Right,
+                        LeftBumper, RightBumper, LeftTrigger, RightTrigger,
+                        Start, Back,
+                        LeftStickX, LeftStickY,
+                        RightStickX, RightStickY
+                    );
+                }
+            }
+
+            global_exports.Update(width, height, timestamp / 1000.0)
+            //time_after_game = performance.now()
+            BufferStart = 1024 * 1024 + 1024 + 16 + 4 * 1024 * 1024
+            for (i = 0; i < ImageData.data.length; i++) {
+                ImageData.data[i] = memory[i + BufferStart]
+            }
+            ctx.putImageData(ImageData, 0, 0)
+            //time_after_blit = performance.now()
+
+            //time_game = time_after_game - time_start;
+            //time_blit = time_after_blit - time_after_game;
+            //console.log("game: " + time_game + "\nblit: " + time_blit)
+        }
+        window.requestAnimationFrame(loop)
+    }
+    window.requestAnimationFrame(loop)
+
+    // First 8MB is reserved for the output buffer. max resolution of 1920x1080
+    // We have 64MB of ram in total to play with
+
+    function reportWindowSize() {
+        if (global_exports_loaded) {
+            width = window.innerWidth
+            height = window.innerHeight
+            maxwidth = 1920 / 2;
+            maxheight = 1080 / 2;
+            if (width > maxwidth) {
+                width = maxwidth
+            }
+            if (height > maxheight) {
+                height = maxheight
+            }
+
+            canvas.width = width
+            canvas.height = height
+            ImageData = ctx.getImageData(0, 0, width, height)
+            MemorySize = 1024 * 1024 + 1024 + 16 + 4 * 1024 * 1024 + 8 * 1024 * 1024;
+            memory = new Uint8ClampedArray(global_exports.memory.buffer, 0, MemorySize)
+            console.log(width);
+            console.log(height);
+        }
+    }
+
+    window.onresize = reportWindowSize;
+</script>
