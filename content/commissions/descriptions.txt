@@ -680,7 +680,7 @@ title 		= Heavy Massage
 filename 	= IMG_2029.JPG
 description = Coal went to his usual massage parlour, asking for the most intense thing they offer. Not knowing what he was getting into the big gryphon accepts and starts methodically trampling him. Immedietly coal knows something has gone terribly wrong, wheezing, crying and whimpering as the heavy tread of the gryphon breaks him.\n\nDrawn by Thaz.
 date 		= 2021-11-06
-link 		= 
+link 		= https://www.furaffinity.net/view/43917425/
 tags 		= 
 
 [Entry]
@@ -784,7 +784,7 @@ title 		= Getting sat on
 filename 	= CoalSketch5_F.jpg
 description = Torvid sits down on coal, huffing to himself as he feels the poor wolf wheeze and groan. Maybe he should think carefully about where he decides to go on a hike.\n\nDrawn by Thaz\nGryphon is me, Canine is Coal.
 date 		= 2021-11-23
-link 		= 
+link 		= https://www.furaffinity.net/view/45111898/
 tags 		= 
 
 [Entry]
@@ -851,6 +851,14 @@ filename 	= Cutevid.png
 description = Torvid looking up at you with puppy eyes, wanting micros to play with >v>\n\nDrawn by MagPi
 date 		= 2022-03-19
 link 		= 
+tags 		= 
+
+[Entry]
+title 		= Double Teaming
+filename 	= WaffleCom1_S.jpg
+description = Torvid and Thaz show waffle where he belongs, forcing him to endure a long day of getting suqeezed and smothered under their combined weight and musky paws.
+date 		= 2022-02-05
+link 		= https://www.furaffinity.net/view/45820657/
 tags 		= 
 
 [Entry]
