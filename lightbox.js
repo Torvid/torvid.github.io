@@ -1,3 +1,113 @@
+function enableLightbox(path, title, desc, source)
+{
+	//var expandImg = document.getElementsByTagName("ArtAreaMainImage")[0];
+	//expandImg.innerHTML = "";
+	//
+	//IsVideo  = path.includes("_thumb");
+	//ImagePath=path.replace("_small", "");
+	
+	if(path)
+	{
+		//var str = "Visit Microsoft!";
+		//var res = str.replace("Microsoft", "W3Schools");
+		//
+		//if(IsVideo)
+		//{
+		//	thing = document.createElement("video");
+		//	thing.setAttribute("controls", "")
+		//	expandImg.appendChild(thing);
+		//	
+		//	source = document.createElement("source");
+		//	source.src = path.replace("_thumb.jpg", ".mp4");
+		//	source.type = "video/mp4"
+		//	//console.log(source.src);
+		//	thing.appendChild(source);
+		//	thing.className  = "GalleryMain";
+		//}
+		//else
+		//{
+		//	thing = document.createElement("img");
+		//	
+		//	//link = document.createElement("a");
+		//	//link.href="#img1"
+		//	//
+		//	//link2 = document.createElement("a");
+		//	//link2.href="#"
+		//	//link2.className ="lightbox"
+		//	//link2.id="img1"
+		//	//lightbox = document.createElement("span");
+		//	//lightbox.style="background-image: url('" + ImagePath + "')"
+		//	
+		//	expandImg.appendChild(thing);
+		//	//expandImg.appendChild(link);
+		//	//link.appendChild(thing);
+		//	//link2.appendChild(lightbox);
+		//	//expandImg.appendChild(link2);
+		//	
+		//	thing.src = path
+		//	thing.className  = "GalleryMain";
+		//}
+		
+		//thing.onclick = function()
+		//{
+			
+			
+	
+			//alert(ImagePath)
+			lightbox = document.createElement("span");
+			lightbox.className ="lightboxGallery"
+			
+			if (path.endsWith(".mp4"))
+			{
+				video = document.createElement("video")
+				videoSource = document.createElement("source")
+				video.className = "lightboximageGallery"
+				video.setAttribute("controls", "")
+				video.setAttribute("autoplay", "")
+				video.setAttribute("loop", "")
+				video.appendChild(videoSource);
+				lightbox.appendChild(video);
+
+				isVideo = true;
+				//video.style.display = "block";
+				//image.visibility = "hidden";
+				videoSource.src = "";
+				videoSource.src = path;
+				videoSource.type = "video/mp4";
+				//video.play();
+			}
+			else
+			{
+				thing2 = document.createElement("img");
+				thing2.className = "lightboximageGallery"
+				thing2.src = path
+				lightbox.appendChild(thing2);
+			}
+			
+			thing3 = document.createElement("div");
+			thing3.className = "lightboxtextGallery"
+			thing3.innerHTML = "<h2>" + title + "</h2>\n";
+			thing3.innerHTML += desc;
+			thing3.innerHTML += "<br/>";
+			if (source)
+				thing3.innerHTML += "source: " + "<a href=\"" + source + "\">" + source + "</a>";
+			
+			lightbox.appendChild(thing3);
+			
+			
+			lightbox.onclick = function()
+			{
+				//alert("aaaa")
+				lightbox.remove()
+			}
+			
+			document.body.appendChild(lightbox);
+		//}
+	}
+}
+
+
+/*
 // Sets the position and size of an element
 function SetElementRect(element, x, y, sizeX, sizeY)
 {
@@ -171,3 +281,5 @@ function Update()
 
 }
 requestAnimationFrame(Update);
+
+*/

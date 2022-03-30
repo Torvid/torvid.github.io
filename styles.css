@@ -202,3 +202,29 @@ GalleryBlock
 	border-style: solid;
 	border-width: 1px;
 }
+
+
+.lightboxtextGallery
+{
+    position: absolute;
+    top: 70%;
+	height:30%;
+	width:100%;
+	overflow:auto;
+}
+.lightboximageGallery
+{
+    width: 100%; /* or any custom size */
+    height: 70%; 
+    object-fit: contain;
+}
+.lightboxGallery
+{
+  display:flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+}
