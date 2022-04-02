@@ -1,4 +1,285 @@
 
+; 2021 Stomping Grounds
+[Entry]
+title    = 2018, Escape From the Barn Game
+filename = group_2018_EscapeFromBarnGame
+description = Note! This project was not made by me! It was Designed, Programmedand and Animated by @WaffleMouse!\nI helped out with 3D models and some of the code (pathfinding)
+
+[Entry]
+title    = 2021, Animations from my game, Stomping Grounds!
+filename = group_2021_StompingGrounds
+
+[Entry]
+title    = 2021 Renders
+filename = group_2021
+
+[Entry]
+title    = 2020 Renders
+filename = group_2020
+
+[Entry]
+title    = 2019 Renders
+filename = group_2019
+
+[Entry]
+title    = Animations from "Torvid's Barn"
+filename = group_2018_WeightPlay
+
+[Entry]
+title    = 2018 Renders
+filename = group_2018
+
+[Entry]
+title    = 2017 Renders
+filename = group_2017
+
+[Entry]
+title    = 2016, Poses from the Lion Game
+filename = group_2016_LionGame
+
+[Entry]
+title    = 2016, Animations from the BurdGame
+filename = group_2016_BurdGame
+
+[Entry]
+title    = 2016 Renders and screenshots
+filename = group_2016
+
+
+[Entry]
+title 		= Big Gryphon
+filename 	= StompingGrounds_BigGryphon.mp4
+description = 
+
+[Entry]
+title 		= Stomp Stomp Stomp
+filename 	= StompingGrounds_StompStompStomp.mp4
+description = 
+
+[Entry]
+title 		= Licking Torvids Butt
+filename 	= StompingGrounds_LickingTorvidsButt.mp4
+description = 
+
+[Entry]
+title 		= Fap Crush
+filename 	= StompingGrounds_FapCrush.mp4
+description = 
+
+[Entry]
+title 		= Improper Sawhorse Use
+filename 	= StompingGrounds_ImproperSawhorseUse.mp4
+description = 
+
+[Entry]
+title 		= Leisurely Crushing
+filename 	= StompingGrounds_LeisurelyCrushing.mp4
+description = 
+
+[Entry]
+title 		= Mother Bird Instinicts
+filename 	= StompingGrounds_MotherBirdInstinicts.mp4
+description = 
+
+[Entry]
+title 		= Sergal Throw
+filename 	= StompingGrounds_SergalThrow.mp4
+description = 
+
+[Entry]
+title 		= Facehugger
+filename 	= StompingGrounds_StompingGrounds_Facehugger.mp4
+description = 
+
+[Entry]
+title 		= Fatal Flora
+filename 	= StompingGrounds_FatalFlora.mp4
+description = 
+
+[Entry]
+title 		= Short Lived Sex Toy
+filename 	= StompingGrounds_ShortLivedSexToy.mp4
+description = 
+
+[Entry]
+title 		= Mud Bath
+filename 	= StompingGrounds_MudBath.mp4
+description = 
+
+[Entry]
+title 		= Sizechange
+filename 	= StompingGrounds_Sizechange.mp4
+description = 
+
+[Entry]
+title 		= Torivd Vores Wuff
+filename 	= StompingGrounds_TorivdVoresWuff.mp4
+description = 
+
+
+; Lion Game
+
+[Entry]
+title 		= Bad Breath Lion
+filename 	= LionGame_BadBreathLion.png
+description = 
+
+[Entry]
+title 		= Carseat No Breathing
+filename 	= LionGame_CarseatNoBreathing.png
+description = 
+
+[Entry]
+title 		= Coal Lion Revenge
+filename 	= LionGame_CoalLionRevenge.png
+description = 
+
+[Entry]
+title 		= FullWeight Lion Trample
+filename 	= LionGame_FullWeightLionTrample.png
+description = 
+
+[Entry]
+title 		= Sat On No Breathing
+filename 	= LionGame_SatOnNoBreathing.png
+description = 
+
+[Entry]
+title 		= Smushed Between Lion Paws
+filename 	= LionGame_SmushedBetweenLionPaws.png
+description = 
+
+[Entry]
+title 		= Wheel Spoilers
+filename 	= LionGame_WheelSpoilers.png
+description = 
+
+
+; Barn Game
+[Entry]
+title 		= Gameplay video from the Barn Game!
+filename 	= WeightPlay_Gameplay.mp4
+description = 
+
+[Entry]
+title 		= Gameplay intro animation for the Barn Game
+filename 	= WeightPlay_GameIntro.mp4
+description = 
+
+[Entry]
+title 		= Smush the wolf under crotch
+filename 	= WeightPlay_Ballsmush.mp4
+description = 
+
+[Entry]
+title 		= Squeeze the wolfs snout into tailhole
+filename 	= WeightPlay_ButtSmush.mp4
+description = 
+
+[Entry]
+title 		= Crush the wolfs chest underpaw
+filename 	= WeightPlay_CrushUnderpaw.mp4
+description = 
+
+[Entry]
+title 		= Dryhump the wolf
+filename 	= WeightPlay_Dryhump.mp4
+description = 
+
+[Entry]
+title 		= Smother and crush the wolf under crotch
+filename 	= WeightPlay_GroinSmother.mp4
+description = 
+
+[Entry]
+title 		= Horse crushes the wolf against a wall
+filename 	= WeightPlay_HorseCrush.mp4
+description = 
+
+[Entry]
+title 		= Torvid rides a horse
+filename 	= WeightPlay_HorseRide.mp4
+description = 
+
+[Entry]
+title 		= Smush between horse and torivd
+filename 	= WeightPlay_BetweenHorseSmush.mp4
+description = 
+
+[Entry]
+title 		= Barn Game Intro
+filename 	= WeightPlay_Intro.mp4
+description = 
+
+[Entry]
+title 		= Lick the wolf
+filename 	= WeightPlay_Licks.mp4
+description = 
+
+[Entry]
+title 		= Orally rape the wolf
+filename 	= WeightPlay_OralRape.mp4
+description = 
+
+[Entry]
+title 		= Squeeze the wolf underpaw
+filename 	= WeightPlay_PawSqueeze.mp4
+description = 
+
+[Entry]
+title 		= Sadistically Abuse the wolf
+filename 	= WeightPlay_SadisticAbuse.mp4
+description = 
+
+[Entry]
+title 		= Sit on the wolf
+filename 	= WeightPlay_SitCrush.mp4
+description = 
+
+[Entry]
+title 		= Crush between thighs
+filename 	= WeightPlay_ThighCrush.mp4
+description = 
+
+[Entry]
+title 		= Assault & Kill the wolf
+filename 	= WeightPlay_ViolentKilling.mp4
+description = 
+
+[Entry]
+title 		= Swallow the wolf whole and alive
+filename 	= WeightPlay_Vore.mp4
+description = 
+
+[Entry]
+title 		= Piss on the wold
+filename 	= WeightPlay_Watersports.mp4
+description = 
+
+
+; EscapeFromBarnGame
+
+[Entry]
+title 		= Hump Smother
+filename 	= EscapeFromBarnGame_HumpSmother.mp4
+description = 
+
+[Entry]
+title 		= Musk Smother
+filename 	= EscapeFromBarnGame_MuskSmother.mp4
+description = 
+
+[Entry]
+title 		= Paw Smother
+filename 	= EscapeFromBarnGame_PawSmother.mp4
+description = 
+
+[Entry]
+title 		= Paw Wipe
+filename 	= EscapeFromBarnGame_PawWipe.mp4
+description = 
+
+
 ; 2020
 ; misc
 [Entry]
