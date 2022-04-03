@@ -1,5 +1,5 @@
 
-; 2021 Stomping Grounds
+; headings
 [Entry]
 title    = 2018, Escape From the Barn Game
 filename = group_2018_EscapeFromBarnGame
@@ -22,7 +22,7 @@ title    = 2019 Renders
 filename = group_2019
 
 [Entry]
-title    = Animations from "Torvid's Barn"
+title    = 2018, Animations from "Torvid's Barn"
 filename = group_2018_WeightPlay
 
 [Entry]
@@ -45,6 +45,8 @@ filename = group_2016_BurdGame
 title    = 2016 Renders and screenshots
 filename = group_2016
 
+
+; 2021 Stomping Grounds
 
 [Entry]
 title 		= Big Gryphon
