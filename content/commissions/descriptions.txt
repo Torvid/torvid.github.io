@@ -541,7 +541,7 @@ link 		=
 tags 		= Gryphon Torvid Blue jay Elijah Magpie MagPi Trampling Mud Stomp Talons
 
 [Entry]
-title 		= I don't like mud Page 1
+title 		= I don't like mud Page 2
 filename 	= mag_eli_trample_page2.png
 description 	= An idea is soon agreed upon, and the two corvids turn to face their gryphon friend.  \n\nDrawn by MagPi
 date 		= 2021-04-17
