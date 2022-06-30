@@ -1,3 +1,30 @@
+console.log('Hello Lightbox');
+
+window.addEventListener('hashchange', function()
+{
+	updateLightboxState();
+})
+
+function updateLightboxState()
+{
+	hash = window.location.hash;
+	console.log("location: " + hash)
+	
+	if(hash != "")
+	{
+		hash = hash.substring(1)
+		path = document.getElementById(hash + "_Link").innerHTML;
+		console.log("path: " + path)
+		text = document.getElementById(hash + "_Text").innerHTML;
+		description = document.getElementById(hash + "_Description").innerHTML;
+		source = document.getElementById(hash + "_Source").innerHTML;
+		
+		enableLightbox("/"+path, text, description, source)
+	}
+}
+
+updateLightboxState();
+
 function enableLightbox(path, title, desc, source)
 {
 	//var expandImg = document.getElementsByTagName("ArtAreaMainImage")[0];
@@ -99,6 +126,7 @@ function enableLightbox(path, title, desc, source)
 			{
 				//alert("aaaa")
 				lightbox.remove()
+				window.location.hash = ""
 			}
 			
 			document.body.appendChild(lightbox);
