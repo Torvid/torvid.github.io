@@ -5,6 +5,11 @@ window.addEventListener('hashchange', function()
 	updateLightboxState();
 })
 
+function setHash(hash)
+{
+	history.pushState(null,null,hash);
+}
+
 function updateLightboxState()
 {
 	hash = window.location.hash;
@@ -126,7 +131,10 @@ function enableLightbox(path, title, desc, source)
 			{
 				//alert("aaaa")
 				lightbox.remove()
-				window.location.hash = ""
+				
+				history.pushState(null,null,'#');
+				//history.pushState({}, "", "#")
+				//window.location.hash = ""
 			}
 			
 			document.body.appendChild(lightbox);
