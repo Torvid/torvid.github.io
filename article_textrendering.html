@@ -231,7 +231,7 @@ video
             </tr>
          </tbody>
       </table>
-      <p><video autoplay><source src="content/articles/textrendering/glyphrendering.mp4" type="video/mp4"></video> </p>
+      <p><video autoplay loop><source src="content/articles/textrendering/glyphrendering.mp4" type="video/mp4"></video> </p>
       <p>To do this horizontal-line intersection we need two intersection functions:</p>
       <ol>
          <li>ray-line intersection for Line Segments</li>
@@ -254,7 +254,7 @@ video
       <p>This gives me what <code>t</code> value along the Segment represents intersections with <code>h</code>. One caveat is that a bezier curve sometimes has two intersections (because parabola).<br />
          You can play with it here: <a href="https://www.desmos.com/calculator/3pmijwu3an">https://www.desmos.com/calculator/3pmijwu3an</a>
       </p>
-      <p><video autoplay><source src="content/articles/textrendering/parabola_intersect.mp4" type="video/mp4"></video> </p>
+      <p><video autoplay loop><source src="content/articles/textrendering/parabola_intersect.mp4" type="video/mp4"></video> </p>
       <p>Finding whether the Segment is "going up" or "going down" is done by simply checking if the start point is above the end point or not. The same holds for the bezier curve, if it intersects twice, the second intersection is always going the other direction (because parabola).</p>
       <p><img src="content/articles/textrendering/Pasted image 20221223161152.png"/></p>
       <p>Wowee, Glyph rasterized!</p>
