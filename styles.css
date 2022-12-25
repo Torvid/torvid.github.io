@@ -55,8 +55,8 @@ TABLE, th, td
 	font-weight:normal;
 	color:var(--main-color);
 	max-width: 1500px;
-	/*margin-right: 9999px;*/
-	table-layout:fixed;
+	/*margin-right: 9999px;
+	table-layout:fixed;*/
 	padding: 5px;
 	width: min-content;
 }

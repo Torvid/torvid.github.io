@@ -69,7 +69,7 @@ video
          It's been a while; I got totally sidetracked into Text Rendering. That is, getting text that looks good to show up in my game. Mainly for UI.
       </p>
       <p>So far, I have been using a monospace sprite-font I created a year ago. It has served me well! But especially in VR, where text is low-res and may be arbitrarily rotated, sheared and warped, it seriously impacts readability.</p>
-      <p>Because of this problem, it becomes worth it to pull out all the stops, employ all tricks and <strong>make sure it's crisp</strong>.</p>
+      <p>Because of this problem, it becomes worth it to pull out all the stops, employ all tricks, and <strong>make sure it's crisp</strong>.</p>
       <p>I'll start by showing the before and after.<br />
          Left is new, Right is old.<br /><br />
 		  <video controls ><source src="content/articles/textrendering/fontrendering.mp4" type="video/mp4"></video> 
@@ -97,8 +97,8 @@ video
          </thead>
          <tbody>
             <tr>
-               <td>Without Anti Aliasing</td>
-               <td>With Anti Aliasing</td>
+               <td>Without Anti-Aliasing</td>
+               <td>With Anti-Aliasing</td>
             </tr>
          </tbody>
       </table>
@@ -154,8 +154,8 @@ video
 	  <hr/>
       <p><strong>TrueType</strong> (.ttf)</p>
       <p>When I said no libraries, I meant <strong>no libraries</strong>.</p>
-      <p>One of the first steps was getting a handle on TrueType, the primary file format for digital print and digital screens, used mostly unchanged since the 80s.</p>
-      <p>Ttf is structured internally as a series of tables, each with a name and mostly googlable structure. Here are some fantastic resources:<br />
+      <p>One of the first steps was getting a handle on TrueType, the primary file format for digital print and digital screens, used mostly unchanged since the '80s.</p>
+      <p>Ttf is structured internally as a series of tables, each with a name and mostly googelable structure. Here are some fantastic resources:<br />
          <a href="https://learn.microsoft.com/en-us/typography/truetype/">Official microsoft documentation</a><br />
          <a href="https://handmade.network/forums/articles/t/7330-implementing_a_font_reader_and_rasterizer_from_scratch%252C_part_1__ttf_font_reader.">"Implementing a Font Reader and Rasterizer from Scratch, Part 1: TTF Font Reader."</a>
       </p>
@@ -186,7 +186,7 @@ video
          </tbody>
       </table>
       <p>Conceptually, a glyph is constructed out of two kinds of objects, <em>Line Segments</em> and <em>Curve Segments</em>. Line Segments have a Start Point and an End Point. Curve Segments have a Start Point, Tangent Point and End point. Forming a <em><a href="https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Quadratic_B%C3%A9zier_curves">Quadratic Bezier Curve</a></em></p>
-      <p>The ttf format however, stores Line Segments as series of offsets, "move this far up and this far right". This way, a Line Segment is described with a single point instead of two. Curves are similarly compressed: when an offset is tagged as a curve, instead of representing the Start, Tangent and End points it represents just the Tangent Point. The Start and End points of the Curve Segment are only implied, and are to be automatically placed 50/50 between the previous Tangent Point and the current Tangent Point.</p>
+      <p>The ttf format however, stores Line Segments as series of offsets, "move this far up and this far right". This way, a Line Segment is described with a single point instead of two. Curves are similarly compressed: when an offset is tagged as a curve, instead of representing the Start, Tangent and End points it represents just the Tangent Point. The Start and End points of the Curve Segment are only implied and are to be automatically placed 50/50 between the previous Tangent Point and the current Tangent Point.</p>
       <table>
          <thead>
             <tr>
@@ -216,7 +216,7 @@ video
 	  <hr/>
       <p>After extracting the curves, we need to actually draw them to the screen, filled in.</p>
       <h3 id="glyph-rasterization">Glyph rasterization</h3>
-      <p>Rasterisation is done line by line, pixel-by-pixel. We first need to find out whether the pixel is inside of the glyph or not. I did this with a "point-in-polygon" algorithm called "Winding number algorithm" that I found on Wikipedia. Imagine drawing a line horizontally out from the pixel. Every time the line crosses a segment of the glyph we find whether the intersected segment is going "up" or "down". Up means -1, Down means +1. If the sum of these values is one or above, the point is inside the glyph. If the sum is zero or negative, the point is outside. <a href="https://en.wikipedia.org/wiki/Point_in_polygon#Winding_number_algorithm">Check out the wikipedia article for a more detailed description.</a></p><br/>
+      <p>Rasterization is done line by line, pixel-by-pixel. We first need to find out whether the pixel is inside of the glyph or not. I did this with a "point-in-polygon" algorithm called "Winding number algorithm" that I found on Wikipedia. Imagine drawing a line horizontally out from the pixel. Every time the line crosses a segment of the glyph we find whether the intersected segment is going "up" or "down". Up means -1, Down means +1. If the sum of these values is one or above, the point is inside the glyph. If the sum is zero or negative, the point is outside. <a href="https://en.wikipedia.org/wiki/Point_in_polygon#Winding_number_algorithm">Check out the wikipedia article for a more detailed description.</a></p><br/>
       <table>
          <thead>
             <tr>
@@ -258,11 +258,11 @@ video
       <p>Finding whether the Segment is "going up" or "going down" is done by simply checking if the start point is above the end point or not. The same holds for the bezier curve, if it intersects twice, the second intersection is always going the other direction (because parabola).</p>
       <p><img src="content/articles/textrendering/Pasted image 20221223161152.png"/></p>
       <p>Wowee, Glyph rasterized!</p>
-      <p>but.. uh oh. If you look closely, you can see that it's very pixely, no Anti Aliasing in sight!</p><br/>
+      <p>but.. uh oh. If you look closely, you can see that it's very pixelated, no Anti-Aliasing in sight!</p><br/>
       <h2 id="applying-the-distance-field">Applying the distance field.</h2>
 	  <hr/>
       <p>The last part needed is to turn this shape into a distance field.</p>
-      <p>For this we need two distance functions: Distance To Line Segment and Distance To Bezier Segment. Distance to Line Segment is easy enough, this video by Inigo Quilez explains it very nicely <a href="https://www.youtube.com/watch?v=PMltMdi1Wzg">https://www.youtube.com/watch?v=PMltMdi1Wzg</a> Distance To Bezier Segment however is much harder, apparently you need to either solve a Quintic Equation or use some numerical approach like Newton's method. If anyone good at math is reading this, I would absolutely love to learn how to do either of these! For now though I gave up, and used another solution by Inigo Quilez, linked here: <a href="https://iquilezles.org/articles/distfunctions2d/">https://iquilezles.org/articles/distfunctions2d/</a></p>
+      <p>For this we need two distance functions: Distance To Line Segment and Distance To Bezier Segment. Distance to Line Segment is easy enough, this video by Inigo Quilez explains it very nicely <a href="https://www.youtube.com/watch?v=PMltMdi1Wzg">https://www.youtube.com/watch?v=PMltMdi1Wzg</a> Distance To Bezier Segment however is much harder, apparently you need to either solve a Quintic Equation or use some numerical approach like Newton's method. If anyone good at math is reading this, I would absolutely love to learn how to do either of these! For now, though, I gave up and used another solution by Inigo Quilez, linked here: <a href="https://iquilezles.org/articles/distfunctions2d/">https://iquilezles.org/articles/distfunctions2d/</a></p>
       <p>Evaluating these functions for every pixel gives us this result:</p>
       <p><img src="content/articles/textrendering/Pasted image 20221223171156.png"/><br /><br />
          It looks.. almost correct? But the value shown is the distance to the edges of the glyph rather than the distance to the glyph itself. To resolve this, we can use the flat rasterized glyph from the previous chapter to invert the inside, making it go from grey to white instead of grey to black.
@@ -276,14 +276,14 @@ video
 	 <img style="max-width: 100%;" src="content/articles/textrendering/Pasted image 20221220010105.png"/>
 	 <img style="max-width: 100%;" src="content/articles/textrendering/image.png"/>
    </div>
-      <p>Thanks a ton to Maple for proofreading and giving feedback on this article &lt;3</p><br/>
+      <p>Thanks a ton to Maple for proofreading and giving feedback on this article!! &lt;3</p><br/>
 	  2022-12-25
 </CustomCenter2>
 <script src="/lightbox.js"></script>
 
             <hr/>
             <CustomCenter>
-                Last updated 2022-12-25<br/>
+                Last updated 2022-12-26<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
