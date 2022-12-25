@@ -36,8 +36,7 @@ BODY
 }
 p
 {
-	max-width: 1000px;
-	margin: auto;
+	
 	font-size: large;
 }
 @media only screen and (hover: none) and (pointer: coarse)
@@ -47,14 +46,23 @@ p
 		font-size: xx-large;
 	}
 }
-TABLE
+TABLE, th, td
 {
+	border-collapse: collapse;
+	border: 1px solid;
 	background-color:var(--background-color);
 	font-family:Verdana;
 	font-weight:normal;
 	color:var(--main-color);
 	max-width: 1500px;
-	margin: auto
+	/*margin-right: 9999px;*/
+	table-layout:fixed;
+	padding: 5px;
+	width: min-content;
+}
+td
+{
+	font-size: medium;
 }
 INPUT,
 option,
@@ -138,7 +146,6 @@ CustomCenter
 		width: 100%;
 	}
 }
-
 GalleryBlock
 {
 	display: grid;

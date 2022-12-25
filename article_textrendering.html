@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+                <head>
+                    <title>Torvid</title>
+                    <meta property="og:image" content="http://www.torvid.pw/favicon.jpg" />
+                    <meta property="og:title" content="Torvid's barn." />
+                    <meta property="og:site_name" content="torvid.net" />
+                    <meta property="og:description" content="Welcome." />
+
+                    <link rel="shortcut icon" href="/favicon.jpg" />
+                    <link rel="stylesheet" href="/styles.css">
+
+
+                    <!-- Global site tag (gtag.js) - Google Analytics -->
+                    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-61846769-2"></script>
+                    <script>
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+
+                      gtag('config', 'UA-61846769-2');
+                    </script>
+
+
+                </head>
+                <!--<script src="/functions.js"></script>-->
+                <body bgcolor="black">
+
+
+                <CustomCenter>
+                    <!--<p>pw.torvid.vore<p>-->
+                    <h1>torvid.net</h1>
+                    &nbsp;<a href="/home" id = "MainLink">Home</a>&nbsp;
+                    &nbsp;<a href="/games" id = "GamesLink">Games</a>&nbsp;
+                    &nbsp;<a href="/gallery" id = "ImagesLink">Renders</a>&nbsp;
+                    &nbsp;<a href="/commissions" id = "commissionsLink">Art Gallery</a>&nbsp;
+                    &nbsp;<a href="/conventions" id = "conventionsLink">Furry Conventions</a>&nbsp;
+                    <br/>
+                    <br/>
+                </CustomCenter>
+            <hr/>
+            
+
+<style>
+CustomCenter2
+{
+	width: 50em;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+@media only screen and (max-width: 50em)
+{
+	CustomCenter2
+	{
+		width: 100%;
+	}
+}
+video
+{
+	max-width: 100%;
+}
+</style>
+
+<CustomCenter2>
+   <div id="content">
+      <h1>Text Rendering</h1>
+      <p>Hello hello!<br />
+         It's been a while; I got totally sidetracked into Text Rendering. That is, getting text that looks good to show up in my game. Mainly for UI.
+      </p>
+      <p>So far, I have been using a monospace sprite-font I created a year ago. It has served me well! But especially in VR, where text is low-res and may be arbitrarily rotated, sheared and warped, it seriously impacts readability.</p>
+      <p>Because of this problem, it becomes worth it to pull out all the stops, employ all tricks and <strong>make sure it's crisp</strong>.</p>
+      <p>I'll start by showing the before and after.<br />
+         Left is new, Right is old.<br /><br />
+		  <video controls ><source src="content/articles/textrendering/fontrendering.mp4" type="video/mp4"></video> 
+      </p>
+	 <img style="max-width: 100%;" src="content/articles/textrendering/image.png"/><br/>
+      <h2 id="making-sure-its-crisp">Making sure it's crisp.</h2>
+	  <hr/>
+      <p>Following is a detailed-ish walkthrough of the steps I took one after another to achieve these results without using any engine, libraries or frameworks.</p>
+      <p>For rendering the font ingame, I considered three methods:</p>
+      <ol>
+         <li>Load the font, turn it into geometry and draw it like normal geometry with <em>MSAA</em>.</li>
+         <li>Upload the curves to the GPU directly and draw them with a <em>big shader</em>.</li>
+         <li>Rasterize the font to a <em>Distance Field</em> offline then render it as a texture.</li>
+      </ol>
+      <p>I chose option 3, mainly because I've seen it before in other games and it provides "good enough" results at very low cost.</p>
+      <p>So what even are distance fields? What problem do they solve?<br />
+         The easy explanation is <em>Anti-Aliasing</em>. If we draw a font directly, we get these ugly jaggies on angled lines and curves.
+      </p>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221221202452.png"><img src="content/articles/textrendering/Pasted image 20221221202452.png"/></th>
+               <th id="!pasted_image_20221221202510.png"><img src="content/articles/textrendering/Pasted image 20221221202510.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Without Anti Aliasing</td>
+               <td>With Anti Aliasing</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>Traditional font renderers (as far as I understand) solve this problem by rendering the font once with really good AA at a couple pre-set resolutions. Then it simply picks from those pre-rendered images. If we were only dealing with 2D text, this would be perfect. But if we need 3D text, like in VR, we would need to project the font from 3D in the world to 2D on the screen, then re-rasterize it every frame to get perfect Anti-Aliasing. That would be very expensive. The solution? Generate a Distance Field Texture that lets us dynamically choose the amount of AA to apply. A distance field texture looks like this:</p><br/>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221221215654.png"><img src="content/articles/textrendering/Pasted image 20221221215654.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Distance Field Texture</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>If the text is small on the screen, the jaggies get bigger. When the jaggies are bigger, we need to "blur" the edges more to make it appear smooth. With a Distance Field Texture, this "blur" amount can be changed on the fly simply by increasing the contrast of the image.</p><br/>
+      <table>
+         <thead>
+            <tr>
+               <th id="!image1.png"><img src="content/articles/textrendering/image1.png"/></th>
+               <th id="!image2.png"><img src="content/articles/textrendering/image2.png"/></th>
+               <th id="!image3.png"><img src="content/articles/textrendering/image3.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Low contrast, way too blurry</td>
+               <td>Medium Contrast still too blurry</td>
+               <td>High Contrast, looks good</td>
+            </tr>
+         </tbody>
+      </table>
+      <table>
+         <thead>
+            <tr>
+               <th id="!image4.png"><img src="content/articles/textrendering/image4.png"/></th>
+               <th id="!image5.png"><img src="content/articles/textrendering/image5.png"/></th>
+               <th id="!image6.png"><img src="content/articles/textrendering/image6.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Low contrast, too blurry even at low resolution</td>
+               <td>Medium Contrast perfect</td>
+               <td>High Contrast, too sharp</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>Using the built-in ddx/ddy shader-functions, a 'perfect' contrast value can be aquired that will make sure the blend region is always exactly one pixel wide, no matter the angle or zoom.  <a href="https://bgolus.medium.com/anti-aliased-alpha-test-the-esoteric-alpha-to-coverage-8b177335ae4f">This article</a> by Ben Golus goes into more detail if you want to implement this yourself.</p>
+      <p>This is how Distance Field Textures solve the Aliasing problem at any resolution or angle.</p><br/>
+      <h2 id="pulling-out-all-the-stops">Pulling out all the stops.</h2>
+	  <hr/>
+      <p><strong>TrueType</strong> (.ttf)</p>
+      <p>When I said no libraries, I meant <strong>no libraries</strong>.</p>
+      <p>One of the first steps was getting a handle on TrueType, the primary file format for digital print and digital screens, used mostly unchanged since the 80s.</p>
+      <p>Ttf is structured internally as a series of tables, each with a name and mostly googlable structure. Here are some fantastic resources:<br />
+         <a href="https://learn.microsoft.com/en-us/typography/truetype/">Official microsoft documentation</a><br />
+         <a href="https://handmade.network/forums/articles/t/7330-implementing_a_font_reader_and_rasterizer_from_scratch%252C_part_1__ttf_font_reader.">"Implementing a Font Reader and Rasterizer from Scratch, Part 1: TTF Font Reader."</a>
+      </p>
+      <p>The first part of reading the file that really gave me a lot of trouble was the <code>glyf</code> table, which contains the actual curve data that describes the shape of the glyphs themselve.</p><br/>
+      <table>
+         <thead>
+            <tr>
+               <th id="!20221120022635729.png_!20221117171136416.png"><img src="content/articles/textrendering/20221120022635729.png"/> <img src="content/articles/textrendering/20221117171136416.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Some examples of me failing to read the data corectly x'D</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>The packing format here is very clever, clearly designed for an era without gigabytes of RAM available. I eventually got all the points and their associated metadata extracted correctly.</p>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221222230209.png"><img src="content/articles/textrendering/Pasted image 20221222230209.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>The '@' glyph is constructed from two contours (a closed loop sequence of Line Segments, shown here as green and purple).</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>Conceptually, a glyph is constructed out of two kinds of objects, <em>Line Segments</em> and <em>Curve Segments</em>. Line Segments have a Start Point and an End Point. Curve Segments have a Start Point, Tangent Point and End point. Forming a <em><a href="https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Quadratic_B%C3%A9zier_curves">Quadratic Bezier Curve</a></em></p>
+      <p>The ttf format however, stores Line Segments as series of offsets, "move this far up and this far right". This way, a Line Segment is described with a single point instead of two. Curves are similarly compressed: when an offset is tagged as a curve, instead of representing the Start, Tangent and End points it represents just the Tangent Point. The Start and End points of the Curve Segment are only implied, and are to be automatically placed 50/50 between the previous Tangent Point and the current Tangent Point.</p>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221225001509.png"><img src="content/articles/textrendering/Pasted image 20221225001509.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Notice how the Endpoints (marked End) always lie exactly between the Tangent points (marked Tan). These red points are not stored in the file.</td>
+            </tr>
+         </tbody>
+      </table>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221222230424.png"><img src="content/articles/textrendering/Pasted image 20221222230424.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Here is the complete glyph, with all the real and implied points drawn.</td>
+            </tr>
+         </tbody>
+      </table>
+      <p>Huzzah, I got the data I wanted. Now for the hard part.</p><br/>
+      <h2 id="employing-all-the-tricks">Employing all the tricks.</h2>
+	  <hr/>
+      <p>After extracting the curves, we need to actually draw them to the screen, filled in.</p>
+      <h3 id="glyph-rasterization">Glyph rasterization</h3>
+      <p>Rasterisation is done line by line, pixel-by-pixel. We first need to find out whether the pixel is inside of the glyph or not. I did this with a "point-in-polygon" algorithm called "Winding number algorithm" that I found on Wikipedia. Imagine drawing a line horizontally out from the pixel. Every time the line crosses a segment of the glyph we find whether the intersected segment is going "up" or "down". Up means -1, Down means +1. If the sum of these values is one or above, the point is inside the glyph. If the sum is zero or negative, the point is outside. <a href="https://en.wikipedia.org/wiki/Point_in_polygon#Winding_number_algorithm">Check out the wikipedia article for a more detailed description.</a></p><br/>
+      <table>
+         <thead>
+            <tr>
+               <th id="!pasted_image_20221223013721.png"><img src="content/articles/textrendering/Pasted image 20221223013721.png"/></th>
+               <th id="!pasted_image_20221223013742.png"><img src="content/articles/textrendering/Pasted image 20221223013742.png"/></th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>The total sum of the intersections here is 0 (0 - 1 + 1 - 1 + 1), meaning the point is outside of the glyph.</td>
+               <td>The sum of the intersections is 1 (1 - 1 + 1 - 1 + 1), meaning the point is inside of the glyph.</td>
+            </tr>
+         </tbody>
+      </table>
+      <p><video autoplay><source src="content/articles/textrendering/glyphrendering.mp4" type="video/mp4"></video> </p>
+      <p>To do this horizontal-line intersection we need two intersection functions:</p>
+      <ol>
+         <li>ray-line intersection for Line Segments</li>
+         <li>ray-bezier intersection for Curve Segments</li>
+      </ol>
+      <p>The intersection between <code>h</code> (the height of the horizontal line) and the Segment can be found by formulating them like this:</p>
+      <ol>
+         <li>ray-line: <code>lerp(a, b, t) = h</code></li>
+         <li>ray-bezier: <code>lerp(lerp(a, c, t), lerp(c, b, t), t) = h</code><br />
+            where:<br />
+            <code>a</code> is the Start Point<br />
+            <code>b</code> is the End Point<br />
+            <code>c</code> is the Tangent Point<br />
+            <code>t</code> is a 0-1 distance along the Segment<br />
+            and <code>lerp(a, b, t)</code> is  <code>a * (1 - t) + b * t</code><br />
+            And then solving for <code>t</code>.
+         </li>
+      </ol>
+      <p>I used Wolfram Alpha for this because I'm lazy.</p>
+      <p>This gives me what <code>t</code> value along the Segment represents intersections with <code>h</code>. One caveat is that a bezier curve sometimes has two intersections (because parabola).<br />
+         You can play with it here: <a href="https://www.desmos.com/calculator/3pmijwu3an">https://www.desmos.com/calculator/3pmijwu3an</a>
+      </p>
+      <p><video autoplay><source src="content/articles/textrendering/parabola_intersect.mp4" type="video/mp4"></video> </p>
+      <p>Finding whether the Segment is "going up" or "going down" is done by simply checking if the start point is above the end point or not. The same holds for the bezier curve, if it intersects twice, the second intersection is always going the other direction (because parabola).</p>
+      <p><img src="content/articles/textrendering/Pasted image 20221223161152.png"/></p>
+      <p>Wowee, Glyph rasterized!</p>
+      <p>but.. uh oh. If you look closely, you can see that it's very pixely, no Anti Aliasing in sight!</p><br/>
+      <h2 id="applying-the-distance-field">Applying the distance field.</h2>
+	  <hr/>
+      <p>The last part needed is to turn this shape into a distance field.</p>
+      <p>For this we need two distance functions: Distance To Line Segment and Distance To Bezier Segment. Distance to Line Segment is easy enough, this video by Inigo Quilez explains it very nicely <a href="https://www.youtube.com/watch?v=PMltMdi1Wzg">https://www.youtube.com/watch?v=PMltMdi1Wzg</a> Distance To Bezier Segment however is much harder, apparently you need to either solve a Quintic Equation or use some numerical approach like Newton's method. If anyone good at math is reading this, I would absolutely love to learn how to do either of these! For now though I gave up, and used another solution by Inigo Quilez, linked here: <a href="https://iquilezles.org/articles/distfunctions2d/">https://iquilezles.org/articles/distfunctions2d/</a></p>
+      <p>Evaluating these functions for every pixel gives us this result:</p>
+      <p><img src="content/articles/textrendering/Pasted image 20221223171156.png"/><br /><br />
+         It looks.. almost correct? But the value shown is the distance to the edges of the glyph rather than the distance to the glyph itself. To resolve this, we can use the flat rasterized glyph from the previous chapter to invert the inside, making it go from grey to white instead of grey to black.
+      </p>
+      <p><img src="content/articles/textrendering/Pasted image 20221223171544.png"/><br /><br />
+         Blmmo. Distance field done!
+      </p>
+      <p>Here's the completed spritesheet, rendered using the font Atkinson Hyperlegible<br />
+      </p>
+	 <img src="content/articles/textrendering/Pasted image 20221223051037.png"/>
+	 <img style="max-width: 100%;" src="content/articles/textrendering/Pasted image 20221220010105.png"/>
+	 <img style="max-width: 100%;" src="content/articles/textrendering/image.png"/>
+   </div>
+      <p>Thanks a ton to Maple for proofreading and giving feedback on this article &lt;3</p><br/>
+	  2022-12-25
+</CustomCenter2>
+<script src="/lightbox.js"></script>
+
+            <hr/>
+            <CustomCenter>
+                Last updated 2022-12-25<br/>
+                <br/>
+                If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
+                I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
+                If you just want updates and art: <a href="https://t.me/joinchat/AAAAAFa-5FbNAVDHbQvkUA">https://t.me/joinchat/AAAAAFa-5FbNAVDHbQvkUA</a> <br/>
+
+                web 1.0 never died
+                <br/>
+                <br/>
+            </CustomCenter>
+</body> 
+            </html>
