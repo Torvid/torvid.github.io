@@ -75,7 +75,6 @@ TEXTAREA
 	font-weight:normal;
 	color:var(--main-color);
 }
-
 div.img:hover
 {
 	border: 1px solid var(--main-color);
@@ -234,4 +233,8 @@ GalleryBlock
   bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.8);
+}
+navigation
+{
+	font-size: x-large;
 }
