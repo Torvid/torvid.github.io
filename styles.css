@@ -220,7 +220,8 @@ GalleryBlock
 }
 .lightboximageGallery
 {
-    width: 100%; /* or any custom size */
+    margin-left:auto;
+    margin-right:auto;
     height: 70%; 
     object-fit: contain;
 }

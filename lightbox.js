@@ -62,6 +62,8 @@ function enableLightbox(path, title, desc, source)
 			videoSource.src = "";
 			videoSource.src = path;
 			videoSource.type = "video/mp4";
+			video.addEventListener("click", (event) => {event.stopPropagation();});
+			videoSource.addEventListener("click", (event) => {event.stopPropagation();});
 		}
 		else
 		{
@@ -69,19 +71,25 @@ function enableLightbox(path, title, desc, source)
 			thing2.className = "lightboximageGallery"
 			thing2.src = path
 			lightbox.appendChild(thing2);
+			thing2.addEventListener("click", (event) => {event.stopPropagation();});
 		}
 		
 		thing3 = document.createElement("div");
+		paragraph = document.createElement("p");
+		thing3.appendChild(paragraph)
 		thing3.className = "lightboxtextGallery"
-		thing3.innerHTML = "<h2>" + title + "</h2>\n";
-		thing3.innerHTML += desc;
-		thing3.innerHTML += "<br/>";
+		paragraph.innerHTML = "<h2>" + title + "</h2>\n";
+		paragraph.innerHTML += desc;
+		paragraph.innerHTML += "<br/>";
+		
 		
 		if (source)
-			thing3.innerHTML += "source: " + "<a href=\"" + source + "\">" + source + "</a>";
+			paragraph.innerHTML += "source: " + "<a href=\"" + source + "\">" + source + "</a>";
 		
 		lightbox.appendChild(thing3);
 		
+		paragraph.addEventListener("click", (event) => {event.stopPropagation();});
+
 		lightbox.onclick = function()
 		{
 			lightbox.remove()
