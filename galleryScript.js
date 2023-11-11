@@ -52,8 +52,10 @@ function SetImage(imgs)
 		{
 			//alert(ImagePath)
 			lightbox = document.createElement("span");
+			fuck = document.createElement("div");
 			thing2 = document.createElement("img");
-			lightbox.appendChild(thing2);
+			lightbox.appendChild(fuck);
+			fuck.appendChild(thing2);
 			document.body.appendChild(lightbox);
 			thing2.src = ImagePath
 			thing2.className ="lightboximage"
@@ -61,7 +63,10 @@ function SetImage(imgs)
 			
 			lightbox.onclick = function()
 			{
-				//alert("aaaa")
+				lightbox.remove()
+			}
+			lightbox.onclick = function()
+			{
 				lightbox.remove()
 			}
 		}

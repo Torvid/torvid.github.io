@@ -220,11 +220,16 @@ GalleryBlock
 }
 .lightboximageGallery
 {
-    margin-left:auto;
-    margin-right:auto;
-    height: 70%; 
-    max-width: 100%; 
-    object-fit: contain;
+	max-height: 100%;
+	max-width: 100%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.fuck
+{
+	height: 70%;
+	width: 100%;
 }
 .lightboxGallery
 {

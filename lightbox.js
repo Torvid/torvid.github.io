@@ -51,12 +51,15 @@ function enableLightbox(path, title, desc, source)
 		{
 			video = document.createElement("video")
 			videoSource = document.createElement("source")
+			fuck = document.createElement("div")
+			fuck.className = "fuck"
 			video.className = "lightboximageGallery"
 			video.setAttribute("controls", "")
 			video.setAttribute("autoplay", "")
 			video.setAttribute("loop", "")
 			video.appendChild(videoSource);
-			lightbox.appendChild(video);
+			lightbox.appendChild(fuck);
+			fuck.appendChild(video);
 
 			isVideo = true;
 			videoSource.src = "";
@@ -67,10 +70,13 @@ function enableLightbox(path, title, desc, source)
 		}
 		else
 		{
+			fuck = document.createElement("div")
+			fuck.className = "fuck"
 			thing2 = document.createElement("img");
 			thing2.className = "lightboximageGallery"
 			thing2.src = path
-			lightbox.appendChild(thing2);
+			lightbox.appendChild(fuck);
+			fuck.appendChild(thing2);
 			thing2.addEventListener("click", (event) => {event.stopPropagation();});
 		}
 		
@@ -90,6 +96,12 @@ function enableLightbox(path, title, desc, source)
 		
 		paragraph.addEventListener("click", (event) => {event.stopPropagation();});
 
+		fuck.onclick = function()
+		{
+			lightbox.remove()
+			
+			history.pushState(null, null, '#');
+		}
 		lightbox.onclick = function()
 		{
 			lightbox.remove()
