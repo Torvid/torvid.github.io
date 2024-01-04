@@ -1,0 +1,56 @@
+In file included from game.c:4:
+./math.c:38:7: warning: incompatible redeclaration of library function 'floor' [-Wincompatible-library-redeclaration]
+   38 | float floor(float n) { return (float)(int)(n < 0 ? (n - 1) : n); }
+      |       ^
+./math.c:38:7: note: 'floor' is a builtin with type 'double (double)'
+./math.c:39:7: warning: incompatible redeclaration of library function 'round' [-Wincompatible-library-redeclaration]
+   39 | float round(float a) { return floor(a + 0.5f); }
+      |       ^
+./math.c:39:7: note: 'round' is a builtin with type 'double (double)'
+./math.c:40:7: warning: incompatible redeclaration of library function 'ceil' [-Wincompatible-library-redeclaration]
+   40 | float ceil(float n) { return floor(n + 1); }
+      |       ^
+./math.c:40:7: note: 'ceil' is a builtin with type 'double (double)'
+./math.c:48:7: warning: incompatible redeclaration of library function 'atan2' [-Wincompatible-library-redeclaration]
+   48 | float atan2(float x, float y)
+      |       ^
+./math.c:48:7: note: 'atan2' is a builtin with type 'double (double, double)'
+./math.c:64:7: warning: incompatible redeclaration of library function 'pow' [-Wincompatible-library-redeclaration]
+   64 | float pow(float a, float b)
+      |       ^
+./math.c:64:7: note: 'pow' is a builtin with type 'double (double, double)'
+./math.c:70:48: warning: implicit conversion from 'int' to 'float' changes value from 1072632447 to 1072632448 [-Wimplicit-const-int-float-conversion]
+   70 |     u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+      |                                              ~ ^~~~~~~~~~
+./math.c:116:7: warning: incompatible redeclaration of library function 'sin' [-Wincompatible-library-redeclaration]
+  116 | float sin(float x)
+      |       ^
+./math.c:116:7: note: 'sin' is a builtin with type 'double (double)'
+./math.c:131:7: warning: incompatible redeclaration of library function 'cos' [-Wincompatible-library-redeclaration]
+  131 | float cos(float n)
+      |       ^
+./math.c:131:7: note: 'cos' is a builtin with type 'double (double)'
+./math.c:135:7: warning: incompatible redeclaration of library function 'sqrt' [-Wincompatible-library-redeclaration]
+  135 | float sqrt(float a)
+      |       ^
+./math.c:135:7: note: 'sqrt' is a builtin with type 'double (double)'
+game.c:184:22: warning: passing 'const char *' to parameter of type 'char *' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+  184 |         string source = str(src);
+      |                             ^~~
+game.c:165:18: note: passing argument to parameter 'str' here
+  165 | string str(char* str)
+      |                  ^
+game.c:302:37: error: expected ';' after expression
+  302 |         result = StringAppend(result, "()")
+      |                                            ^
+      |                                            ;
+game.c:384:2: warning: incompatible pointer types initializing 'char *' with an expression of type 'char *[100]' [-Wincompatible-pointer-types]
+  384 |         stringCreate(amongus, 100);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+game.c:180:87: note: expanded from macro 'stringCreate'
+  180 | #define stringCreate(name, capacity) char* name##_data[capacity] = {}; string name = {name##_data, 0, capacity};
+      |                                                                                       ^~~~~~~~~~~
+<scratch space>:162:1: note: expanded from here
+  162 | amongus_data
+      | ^~~~~~~~~~~~
+11 warnings and 1 error generated.

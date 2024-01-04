@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<canvas id="mainCanvas" style="height:100%;width:100%;position:fixed;left:0;top:0;"></canvas>
+
+<script>
+    window.addEventListener("keydown", function (e)
+    {
+        if (!wasmExports) return;
+        if (e.repeat) return
+        wasmExports.KeyDown(e.keyCode);
+    }, true);
+    window.addEventListener("keyup", function (e)
+    {
+        if (!wasmExports) return;
+        if (e.repeat) return
+        wasmExports.KeyUp(e.keyCode);
+    }, true);
+    window.addEventListener("mousedown", function (e)
+    {
+        if (!wasmExports) return;
+        wasmExports.MouseDown(e.which - 1)
+    }, true);
+    window.addEventListener("mouseup", function (e)
+    {
+        if (!wasmExports) return;
+        wasmExports.MouseUp(e.which - 1)
+    }, true);
+    document.onmousemove = function (e)
+    {
+        if (!wasmExports) return;
+        var rect = mainCanvas.getBoundingClientRect();
+        wasmExports.MouseMove(e.clientX - rect.left, e.clientY - rect.top);
+    }
+    window.addEventListener("wheel", function (e)
+    {
+        if (!wasmExports) return;
+        wasmExports.MouseScroll(e.wheelDeltaY / 120);
+    }, true);
+    
+    const wasmMemoryThing = new WebAssembly.Memory({
+        initial: 2048*2,
+        maximum: 2048*2,
+        shared: true
+    });
+        
+    var mainCanvas = document.getElementById('mainCanvas');
+    var mainCanvasContext = mainCanvas.getContext('2d', { willReadFrequently: true });
+    var wasmMemorySize = 1024*1024*256;
+    var wasmMemory = false;
+    var wasmExports = false
+
+    function CStringToJsString(n)
+    {
+        // n is a pointer to the string
+        // Strings are null-terminated, so read characters untill we hit a 0.
+        // Stop at 200 if the string is too long.
+        // This should probably be changed to also take a length value for memory-safety reasons?
+
+        result = ""
+        for (i = 0; i < 200; i++) {
+            if (wasmMemory[n + i] == 0)
+                break
+            result += String.fromCharCode(wasmMemory[n + i]);
+        }
+        return result
+    }
+    function WebPlatformPrint(string)
+    {
+        console.log(CStringToJsString(string));
+    }
+    var resolutionScale = 1.0;
+    function WebPlatformRequestImageRead(filepath, imagePtr)
+    {
+        filename = CStringToJsString(filepath);
+        var image = new Image();
+        image.src = "../" + filename;
+        image.onload = function ()
+        {
+            var imageCanvas = document.createElement('canvas');
+            imageCanvas.width = image.width;
+            imageCanvas.height = image.height;
+            var imageCanvasContext = imageCanvas.getContext('2d');
+            imageCanvasContext.drawImage(image, 0, 0);
+            data = imageCanvasContext.getImageData(0, 0, image.width, image.height);
+
+            var lastImageDataLocation = wasmExports.WebPlatformGetLastImageLocation()
+            for (i = 0; i < data.data.length; i+=4)
+            {
+                wasmMemory[lastImageDataLocation + i + 0] = data.data[i + 2];
+                wasmMemory[lastImageDataLocation + i + 1] = data.data[i + 1];
+                wasmMemory[lastImageDataLocation + i + 2] = data.data[i + 0];
+                wasmMemory[lastImageDataLocation + i + 3] = data.data[i + 3];
+            }
+            wasmExports.WebPlatformRequestImageReadDone(filepath, imagePtr, image.width, image.height)
+        };
+        return true;
+    }
+
+    async function Init()
+    {
+        let imports = {};
+        imports['memory'] = wasmMemoryThing;
+        imports['WebPlatformRequestImageRead'] = WebPlatformRequestImageRead;
+        imports['WebPlatformPrint'] = WebPlatformPrint;
+
+        const response = await fetch("web.wasm");
+        const buffer = await response.arrayBuffer();
+        const obj = await WebAssembly.instantiate(buffer, { "env": imports });
+
+        wasmExports = obj.instance.exports;
+        
+        wasmMemory = new Uint8ClampedArray(wasmMemoryThing.buffer, 0, wasmMemorySize)
+        
+        window.requestAnimationFrame(Update);
+    }
+    var lastFrameExecutionTime = 16;
+    var checkTimeCounter = 0;
+    var timestampLast;
+    function Update(timestamp)
+    {
+        //checkTimeCounter++;
+        //if(checkTimeCounter == 10)
+        //{
+        //    if(lastFrameExecutionTime > 20)
+        //    {
+        //        resolutionScale -= 0.05;
+        //    }
+        //    else if(lastFrameExecutionTime < 12)
+        //    {
+        //        resolutionScale += 0.05;
+        //    }
+        //    if(resolutionScale > 1.0)
+        //    {
+        //        resolutionScale = 1.0;
+        //    }
+        //    checkTimeCounter = 0;
+        //    
+        //    CanvasSizeChanged();
+        //}
+
+        const start = performance.now();
+
+        var deltaTime = (timestamp - timestampLast);
+        timestampLast = timestamp;
+        wasmExports.WebUpdate(deltaTime / 1000.0, mainCanvas.width, mainCanvas.height);
+        BufferStart = 1024*1024*(128+16+1) + 1024 * 2 - 48 * 2 ;
+        
+        var imageData = mainCanvasContext.getImageData(0, 0, mainCanvas.width, mainCanvas.height)
+        for (i = 0; i < imageData.data.length; i+=4)
+        {
+            imageData.data[i+0] = wasmMemory[BufferStart + i+2];
+            imageData.data[i+1] = wasmMemory[BufferStart + i+1];
+            imageData.data[i+2] = wasmMemory[BufferStart + i+0];
+            imageData.data[i+3] = 255;
+        }
+        
+        mainCanvasContext.putImageData(imageData, 0, 0)
+
+        const end = performance.now();
+
+        lastFrameExecutionTime = end - start;
+        
+        window.requestAnimationFrame(Update);
+    }
+
+    // handle window resizing
+    function CanvasSizeChanged()
+    {
+        mainCanvas.width = window.innerWidth * resolutionScale
+        mainCanvas.height = window.innerHeight * resolutionScale
+    }
+    CanvasSizeChanged();
+    window.onresize = CanvasSizeChanged;
+
+    Init();
+    
+</script>
