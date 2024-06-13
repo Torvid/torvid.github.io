@@ -47,10 +47,7 @@
 <title>Thingy Web</title>
 
 <div id="DrawingCanvas2">
-    Hello. <br />
-    Sound currently doesn't work on firefox, and is likely to break on chrome in the future. <br />
-    <!--I can't stand any more of this nightmare API. <br />-->
-    If you know of some way to write samples to an audio buffer that's currently playing, or how to cleanly swap from one buffer to the other please, *please* get in contact with me. @Torvid on telegram, Stinger#3621 on discord.<br />
+    3 years later, it works omg. <br />
 </div>
 
 <canvas id="DrawingCanvas">
@@ -331,187 +328,67 @@
     //}
     var context = new AudioContext();
     sampleRate = 44100 // number of samples in 1 second. buffer is 1 second long.
-    soundBuffer = context.createBuffer(2, sampleRate, sampleRate);
+    //soundBuffer = context.createBuffer(2, sampleRate, sampleRate);
 
 
-    var startedAt = 0
+    //var startedAt = 0
 
-    var soundSource;
+    //var soundSource;
     reportWindowSize();
     function UserInteracted() {
         var Blocker = document.getElementById("Blocker");
         Blocker.remove();
 
         // play sound?
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
-        soundSource = context.createBufferSource();
-        soundSource.buffer = soundBuffer;
-        soundSource.connect(context.destination);
-        soundSource.loop = true;
-        soundSource.start(0);
-        startedAt = context.currentTime
-    }
-
-
-
-    function test1() {
-
-        t = 0;
-        // Fill the buffer with sin
-        for (var i = 0; i < sampleRate; i++) {
-            t += 0.025;
-            rightChannelData[i] = Math.sin(t) * 0.1;
-            leftChannelData[i] = Math.sin(t) * 0.1;
+		if (!audioCtx)
+		{
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            nextTime = audioCtx.currentTime;
         }
-        soundBuffer.copyToChannel(leftChannelData, 0, 0);
-        soundBuffer.copyToChannel(rightChannelData, 1, 0);
 
-        soundSource.stop();
-        soundSource = context.createBufferSource();
-        soundSource.buffer = soundBuffer;
-        soundSource.connect(context.destination);
-        soundSource.loop = true;
-        soundSource.start(0);
-        startedAt = context.currentTime
-    }
-    function test2() {
-
-        t = 0;
-        // Fill the buffer with sin
-        for (var i = 0; i < sampleRate; i++) {
-            t += 0.05;
-            rightChannelData[i] = Math.sin(t) * 0.1;
-            leftChannelData[i] = Math.sin(t) * 0.1;
+        // Start or resume the audio context on user interaction
+        if (audioCtx.state === 'suspended')
+		{
+            audioCtx.resume();
         }
-        soundBuffer.copyToChannel(leftChannelData, 0, 0);
-        soundBuffer.copyToChannel(rightChannelData, 1, 0);
-
-        soundSource.stop();
-        soundSource = context.createBufferSource();
-        soundSource.buffer = soundBuffer;
-        soundSource.connect(context.destination);
-        soundSource.loop = true;
-        soundSource.start(0);
-        startedAt = context.currentTime
     }
-    function test3() {
-
-        t = 0;
-        // Fill the buffer with sin
-        for (var i = 0; i < sampleRate; i++) {
-            t += 0.1;
-            rightChannelData[i] = Math.sin(t) * 0.1;
-            leftChannelData[i] = Math.sin(t) * 0.1;
-        }
-        soundBuffer.copyToChannel(leftChannelData, 0, 0);
-        soundBuffer.copyToChannel(rightChannelData, 1, 0);
-
-        soundSource.stop();
-        soundSource = context.createBufferSource();
-        soundSource.buffer = soundBuffer;
-        soundSource.connect(context.destination);
-        soundSource.loop = true;
-        soundSource.start(0);
-        startedAt = context.currentTime
-    }
-
-    var rightChannelData = new Float32Array(sampleRate);
-    var leftChannelData = new Float32Array(sampleRate);
-
-    var WriteCursor = 0;
-    var region1Start = 0;
-    var region1End = 0;
-
-    var region2Start = 0;
-    var region2End = 0;
-    var PlayCursor = 0;
-    var LastPlayCursor = 0;
-    var FramesOfAudioLatency = 4;
-    // if our framerate is below 15 we'll start skipping / stuttering the sound.
-    var LatencySampleCount = FramesOfAudioLatency * (sampleRate / 30);
-    var SampleOffset = 10000; // How many samples ahead of the read cursor we write.
-
+	
+    let audioCtx;
+    let nextTime = 0;
+    let lastFrameTime = 0;
+	
+	
     function loop(timestamp) {
         if (global_exports_loaded) {
-            //time_start = performance.now()
-
-            var PlayCursor = 0;
-            var sampleCountToGet = 0;
-            if (soundSource) {
-
-                LastPlayCursor = PlayCursor;
-
-                PlayCursor = Math.floor(((context.currentTime - startedAt) * soundSource.playbackRate.value % 1.0) * sampleRate);
-
-                TargetCursor = (PlayCursor + (SampleOffset)) % sampleRate;
-
-                if (WriteCursor > TargetCursor) {
-                    //[wwwwwww--------wwwwwww]
-                    //0       ^      ^       21
-                    //      Play   Write
-
-                    region1Start = WriteCursor;
-                    region1End = sampleRate;
-
-                    region2Start = 0;
-                    region2End = TargetCursor;
-
-                }
-                else {
-                    //[-------wwwwwww-------]
-                    //0       ^      ^      21
-                    //      Write   Play
-                    region1Start = WriteCursor;
-                    region1End = TargetCursor;
-                    region2Start = 0;
-                    region2End = 0;
-                }
-
-                // Number of samples to get from the game.
-                sampleCountToGet += region1End - region1Start;
-                sampleCountToGet += region2End - region2Start;
-                WriteCursor = TargetCursor;
-            }
-
-
-            gamepads = navigator.getGamepads()
-            for (var i = 0; i < 4; i++) {
-                if (gamepads[i]) {
-                    X = gamepads[i].buttons[2].pressed;
-                    Y = gamepads[i].buttons[3].pressed;
-                    A = gamepads[i].buttons[0].pressed;
-                    B = gamepads[i].buttons[1].pressed;
-
-                    LeftBumper = gamepads[i].buttons[4].pressed;
-                    RightBumper = gamepads[i].buttons[5].pressed;
-                    LeftTrigger = gamepads[i].buttons[6].pressed;
-                    RightTrigger = gamepads[i].buttons[7].pressed;
-
-                    Up = gamepads[i].buttons[12].pressed;
-                    Down = gamepads[i].buttons[15].pressed;
-                    Left = gamepads[i].buttons[13].pressed;
-                    Right = gamepads[i].buttons[14].pressed;
-
-                    Start = gamepads[i].buttons[8].pressed;
-                    Back = gamepads[i].buttons[9].pressed;
-
-                    LeftStickX = gamepads[i].axes[0];
-                    LeftStickY = gamepads[i].axes[1];
-                    RightStickX = gamepads[i].axes[2];
-                    RightStickY = gamepads[i].axes[3];
-
-                    global_exports.UpdateGamepad(i,
-                        X, Y, A, B,
-                        Up, Down, Left, Right,
-                        LeftBumper, RightBumper, LeftTrigger, RightTrigger,
-                        Start, Back,
-                        LeftStickX, LeftStickY,
-                        RightStickX, RightStickY
-                    );
-                }
-            }
-
+		
+			if (!lastFrameTime)
+			{
+				lastFrameTime = timestamp;
+			}
+			let sampleCountToGet = 0;
+			const elapsedTime = Math.min((timestamp - lastFrameTime) / 1000, 0.1); 
+			
+			if (audioCtx) 
+			{
+				let currentBufferAhead = nextTime - audioCtx.currentTime;
+			
+				let desiredBufferAhead = 0.05; // Target buffer ahead time in seconds
+				
+				if (currentBufferAhead < desiredBufferAhead)
+				{
+					let bufferShortfall = desiredBufferAhead - currentBufferAhead;
+					sampleCountToGet = Math.ceil(sampleRate * bufferShortfall);
+					
+					
+				}
+			}
+			if(sampleCountToGet > 10000)
+			{
+				sampleCountToGet = 10000;
+			}
+			
+			//console.log(sampleCountToGet);
+			
             global_exports.Update(width, height, timestamp / 1000.0, sampleCountToGet, sampleRate)
 
             BufferStart = global_exports.GetBackbufferPlacement();
@@ -524,51 +401,40 @@
                 }
             }
 
-            // Write out samples to the sound buffer
+			if (audioCtx && sampleCountToGet > 0)
+			{
+				memoryInt16 = new Int16Array(memoryThing.buffer, SoundBufferLocation, sampleRate)
+				
+				let leftChannelData = new Float32Array(sampleCountToGet);
+				let rightChannelData = new Float32Array(sampleCountToGet);
+					
+				var sampleIndex = 0;
+				var i = 0;
+				for (var i = 0; i < sampleCountToGet; i++) {
+					leftChannelData[i] = memoryInt16[sampleIndex] / 32767.0;
+					rightChannelData[i] = memoryInt16[sampleIndex + 1] / 32767.0;
+					sampleIndex++;
+					sampleIndex++;
+				}
 
+				const buffer = audioCtx.createBuffer(2, leftChannelData.length, audioCtx.sampleRate);
+				
+				buffer.copyToChannel(leftChannelData, 0);
+				buffer.copyToChannel(rightChannelData, 1);
 
-            memoryInt16 = new Int16Array(memoryThing.buffer, SoundBufferLocation, sampleRate)
-            //memoryInt16 = new Int16Array(memoryThing.buffer, BufferStart, sampleRate * 2)
+				let source = audioCtx.createBufferSource();
+				source.buffer = buffer;
+				source.connect(audioCtx.destination);
 
-            var sampleIndex = 0;
-            for (var i = region1Start; i < region1End; i++) {
-                leftChannelData[i] = memoryInt16[sampleIndex] / 32767.0;
-                rightChannelData[i] = memoryInt16[sampleIndex + 1] / 32767.0;
-                sampleIndex++;
-                sampleIndex++;
-            }
+				if (nextTime < audioCtx.currentTime)
+				{
+					nextTime = audioCtx.currentTime;
+				}
 
-            for (var i = region2Start; i < region2End; i++) {
-                leftChannelData[i] = memoryInt16[sampleIndex] / 32767.0;
-                rightChannelData[i] = memoryInt16[sampleIndex + 1] / 32767.0;
-                sampleIndex++;
-                sampleIndex++;
-            }
-
-            soundBuffer.copyToChannel(leftChannelData, 0, 0);
-            soundBuffer.copyToChannel(rightChannelData, 1, 0);
-
-            // Fill the buffer with sin
-            //var rightChannelData = new Float32Array(sampleRate);
-            //var leftChannelData = new Float32Array(sampleRate);
-            //t = 0;
-            //for (var i = 0; i < sampleRate; i++) {
-            //    t += 0.05;
-            //    rightChannelData[i] = Math.sin(t) * 0.05;
-            //    leftChannelData[i] = Math.sin(t) * 0.05;
-            //}
-            //soundBuffer.copyToChannel(rightChannelData, 0, 0);
-            //soundBuffer.copyToChannel(leftChannelData, 1, 0);
-
-
-            //console.log(sampleCountToGet);
-            //AnyExecuting = false;
-            //for (var i = 0; i < 100; i++) {
-            //    console.log(global_exports.GetThreadExecuting(i));
-            //}
-            //if (AnyExecuting)
-            //    console.log("Something was executing!");
-
+				source.start(nextTime);
+				nextTime += buffer.duration;
+			}
+			
             ctx.putImageData(ImageData, 0, 0)
         }
         window.requestAnimationFrame(loop)

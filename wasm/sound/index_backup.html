@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<link rel="icon" type="image/png" href="/content/wasm/favicon.png" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<head>
+    <meta charset="utf-8">
+</head>
+<style>
+    /*body {
+        margin: 0;
+        padding: 0;
+    }*/
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        background-color: #242424;
+    }
+
+    #DrawingCanvas {
+        margin: auto;
+    }
+
+    #DrawingCanvas2 {
+        color: #ffffff;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+    }
+    .text-container {
+        height: 99%;
+        width: 99%;
+        border: 1px solid #000;
+        text-align: center;
+        color: white;
+        font-size: 5em;
+    }
+
+    .text-container span {
+        display: block;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+
+<title>Thingy Web</title>
+
+<div id="DrawingCanvas2">
+    Hello. <br />
+    Sound currently doesn't work on firefox, and is likely to break on chrome in the future. <br />
+    <!--I can't stand any more of this nightmare API. <br />-->
+    If you know of some way to write samples to an audio buffer that's currently playing, or how to cleanly swap from one buffer to the other please, *please* get in contact with me. @Torvid on telegram, Stinger#3621 on discord.<br />
+</div>
+
+<canvas id="DrawingCanvas">
+</canvas>
+
+<div id="Blocker" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.0; z-index: 1000; background: black" onclick="UserInteracted()" oncontextmenu="UserInteracted()">
+    <div class="text-container">
+        <!--<span>Click me!</span>-->
+    </div>
+</div>
+<!--
+<button onclick="test1()">Test1</button>
+<button onclick="test2()">Test2</button>
+<button onclick="test3()">Test3</button>
+    -->
+<script>
+    window.addEventListener("keydown", function (e) {
+        if (!global_exports_loaded)
+            return;
+        if (e.repeat) return
+        global_exports.KeyDown(e.keyCode);
+    }, true);
+    window.addEventListener("keyup", function (e) {
+        if (!global_exports_loaded)
+            return;
+        if (e.repeat) return
+        global_exports.KeyUp(e.keyCode);
+    }, true);
+
+    window.addEventListener("mousedown", function (e) {
+        if (!global_exports_loaded)
+            return;
+        global_exports.MouseDown(e.which - 1)
+    }, true);
+
+    window.addEventListener("mouseup", function (e) {
+        if (!global_exports_loaded)
+            return;
+        global_exports.MouseUp(e.which - 1)
+    }, true);
+
+    document.onmousemove = function (e) {
+        if (!global_exports_loaded)
+            return;
+        var rect = canvas.getBoundingClientRect();
+        global_exports.MouseMove(e.clientX - rect.left, e.clientY - rect.top);
+    }
+    window.addEventListener("wheel", function (e) {
+        if (!global_exports_loaded)
+            return;
+        global_exports.MouseScroll(e.wheelDeltaY / 120);
+    }, true);
+
+    function PlatformReadImageIntoMemory(Destination, Filename) {
+        Filepath = CStringToJsString(Filename).replace(".tga", ".png");
+
+        var img = new Image();
+        //img.crossOrigin = 'anonymous';
+        img.src = Filepath;
+        img.onload = function () {
+            var ImageCanvas = document.createElement('canvas');
+            //document.body.appendChild(ImageCanvas);
+            ImageCanvas.width = img.width
+            ImageCanvas.height = img.height
+            var context = ImageCanvas.getContext('2d');
+            context.drawImage(img, 0, 0);
+
+            data = context.getImageData(0, 0, img.width, img.height);
+
+            for (i = 0; i < data.data.length; i++) {
+                memory[Destination + i] = data.data[i];
+            }
+        };
+
+        return true;
+    }
+
+    function Type(a)
+    {
+        return a.constructor.name;
+    }
+
+    var fileSoundBuffer = 0
+    var fileSoundBufferData = 0
+    function PlatformReadSoundIntoMemory(Destination, Filename) {
+
+        Filepath = CStringToJsString(Filename);//.replace(".wav", ".mp3");
+
+        // Fix up prefixing
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        //var context = new AudioContext();
+        
+        var request = new XMLHttpRequest();
+        request.open('GET', Filepath, true);
+        //request.open('GET', "sound/Misc_extraball.wav", true);
+        request.responseType = 'arraybuffer';
+        
+        onError = function () {
+            console.log("error loading sound file " + Filepath);
+        }
+        // Decode asynchronously
+        request.onload = function () {
+            context.decodeAudioData(request.response, function (buffer) {
+                fileSoundBuffer = buffer;
+                fileSoundBufferData = fileSoundBuffer.getChannelData(0); // It's been resampled. still mono though.
+
+                memoryInt16 = new Int16Array(memoryThing.buffer, Destination, fileSoundBufferData.length*2)
+                if (fileSoundBuffer.numberOfChannels == 1) // game sound
+                {
+                    for (i = 0; i < fileSoundBufferData.length; i++) {
+                        memoryInt16[i * 2] = fileSoundBufferData[i] * 32767;
+                        memoryInt16[i * 2 + 1] = fileSoundBufferData[i] * 32767;
+                    }
+                }
+                else if (fileSoundBuffer.numberOfChannels == 2) // stereo
+                {
+                    var fileSoundBufferDataRight = fileSoundBuffer.getChannelData(1);
+
+                    for (i = 0; i < fileSoundBufferData.length; i++)
+                    {
+                        memoryInt16[i*2]   = fileSoundBufferData[i]       * 32767;
+                        memoryInt16[i * 2 + 1] = fileSoundBufferDataRight[i]   * 32767;
+                    }
+                }
+                //for (i = 0; i < 10000; i++) {
+                //    memoryInt16[i] = Math.sin(i / 10.0) * 32000.0;
+                //}
+            }, onError);
+        }
+        request.send();
+    }
+
+
+    // Loads persistent data into the memory referenced by Destination.
+    function LoadPersistentData(Destination, SizeInBytes) {
+
+        b64encoded = localStorage.getItem("data");
+        if (b64encoded == null)
+            return;
+
+        var u8_2 = new Uint8ClampedArray(atob(b64encoded).split("").map(function (c) {
+            return c.charCodeAt(0);
+        }));
+
+        // Clear the desired memory region. always do this.
+        for (i = 0; i < SizeInBytes; i++) {
+            memory[Destination + i] = 0;
+        }
+
+        // load the saved data into the region
+        for (i = 0; i < Math.min(u8_2.length, SizeInBytes); i++) {
+
+            memory[Destination + i] = u8_2[i];
+        }
+    }
+    // Writes data referenced to by Source to persistent storage.
+    function SavePersistentData(Source, SizeInBytes) {
+
+        var ascii = new Uint8ClampedArray(SizeInBytes);
+        // Clear the desired memory region. always do this.
+        for (i = 0; i < SizeInBytes; i++) {
+            ascii[i] = memory[Source + i];
+        }
+        var b64encoded = btoa(String.fromCharCode.apply(null, ascii));
+
+        localStorage.setItem("data", b64encoded);
+    }
+
+    function PlatformTime() {
+        return Math.floor(performance.now() * 10000);//BigInt()
+    }
+    function print_num(n) {
+        console.log(n)
+    }
+
+    function CStringToJsString(n) {
+        // n is a pointer to the string
+        // Strings are null-terminated, so read characters untill we hit a 0.
+        // Stop at 200 if the string is too long.
+        // This should probably be changed to also take a length value for memory-safety reasons?
+
+        result = ""
+        for (i = 0; i < 200; i++) {
+            if (memory[n + i] == 0)
+                break
+            result += String.fromCharCode(memory[n + i]);
+        }
+        return result
+    }
+
+    function PlatformPrint(n) {
+        console.log(CStringToJsString(n))
+    }
+
+    const memoryThing = new WebAssembly.Memory({
+        initial: 2048,
+        maximum: 2048,
+        shared: true
+    });
+
+    //workers = []
+    //workerCount = 32; // Change this to 100 later?
+    //for (i = 0; i < workerCount; i++) {
+    //    w = new Worker('webworker.js');
+    //    workers.push(w);
+    //    w.postMessage([true, i, memoryThing, 0]); // Initialize
+    //
+    //    w.onmessage = e => {
+    //        //console.log("Stop: " + typeof(e.data));
+    //        //global_exports.SetThreadExecuting(e.data, false);
+    //    }
+    //}
+
+    var canvas = document.getElementById('DrawingCanvas');
+    // Disable right-click on canvas
+    canvas.addEventListener('contextmenu', function (e) {
+        if (e.button == 2) {
+            // Block right-click menu thru preventing default action.
+            e.preventDefault();
+        }
+    });
+    var ctx = canvas.getContext('2d');
+
+    var global_exports = false
+    var global_exports_loaded = false
+    var width = 0
+    var height = 0
+    var ImageData = 0
+    var SoundBufferLocation = 0 // int16s interleaved left right left right ...
+    var memory = 0
+    var memoryInt16 = 0
+
+    let imports = {};
+    async function init() {
+        imports['PlatformReadImageIntoMemory'] = PlatformReadImageIntoMemory
+        imports['PlatformReadSoundIntoMemory'] = PlatformReadSoundIntoMemory
+        imports['PlatformPrint'] = PlatformPrint
+        imports['PlatformTime'] = PlatformTime
+        imports['LoadPersistentData'] = LoadPersistentData
+        imports['SavePersistentData'] = SavePersistentData
+        //imports['PlatformThreadCall'] = PlatformThreadCall
+        imports['print_num'] = print_num
+        imports['sqrtf'] = function (a) { return Math.sqrtf(a) }
+        imports['floorf'] = function (a) { return Math.floor(a) }
+        imports['ceilf'] = function (a) { return Math.ceil(a) }
+        imports['sinf'] = function (a) { return Math.sin(a) }
+        imports['cosf'] = function (a) { return Math.cos(a) }
+        imports['atan2'] = function (a, b) { return Math.atan2(a, b) }
+        imports['log10'] = function (a) { return Math.log10(a) }
+        imports['fabsf'] = function (a) { return Math.abs(a) }
+        imports['pow'] = function (a, b) { return Math.pow(a, b) }
+        imports['fminf'] = function (a, b) { return Math.min(a, b) }
+        imports['fmaxf'] = function (a, b) { return Math.max(a, b) }
+        imports['roundf'] = function (a) { return Math.round(a) }
+        imports['exp2f'] = function (a) { return Math.exp(a) }
+        imports['acosf'] = function (a) { return Math.acos(a) }
+        imports['isfinite'] = function (a) { return isFinite(a) }
+        imports['memory'] = memoryThing
+
+        // Alternate way of loading wasm that works even if the webserver doesn't support wasm files.
+        const response = await fetch("web.wasm");
+        const buffer = await response.arrayBuffer();
+        const obj = await WebAssembly.instantiate(buffer, { "env": imports });
+        instance = obj.instance;
+
+        global_exports = 0
+
+        global_exports = instance.exports;
+        global_exports_loaded = true;
+        reportWindowSize();
+    }
+    init();
+
+    // Make a sine wave buffer for testing
+    //function test() {
+    //    console.log("asddas");
+    //    fileSoundBuffer.copyToChannel(sineDataArray, 0, 0); // copy in our sin shit
+    //}
+    var context = new AudioContext();
+    sampleRate = 44100 // number of samples in 1 second. buffer is 1 second long.
+    soundBuffer = context.createBuffer(2, sampleRate, sampleRate);
+
+
+    var startedAt = 0
+
+    var soundSource;
+    reportWindowSize();
+    function UserInteracted() {
+        var Blocker = document.getElementById("Blocker");
+        Blocker.remove();
+
+        // play sound?
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+        soundSource = context.createBufferSource();
+        soundSource.buffer = soundBuffer;
+        soundSource.connect(context.destination);
+        soundSource.loop = true;
+        soundSource.start(0);
+        startedAt = context.currentTime
+    }
+
+
+
+    function test1() {
+
+        t = 0;
+        // Fill the buffer with sin
+        for (var i = 0; i < sampleRate; i++) {
+            t += 0.025;
+            rightChannelData[i] = Math.sin(t) * 0.1;
+            leftChannelData[i] = Math.sin(t) * 0.1;
+        }
+        soundBuffer.copyToChannel(leftChannelData, 0, 0);
+        soundBuffer.copyToChannel(rightChannelData, 1, 0);
+
+        soundSource.stop();
+        soundSource = context.createBufferSource();
+        soundSource.buffer = soundBuffer;
+        soundSource.connect(context.destination);
+        soundSource.loop = true;
+        soundSource.start(0);
+        startedAt = context.currentTime
+    }
+    function test2() {
+
+        t = 0;
+        // Fill the buffer with sin
+        for (var i = 0; i < sampleRate; i++) {
+            t += 0.05;
+            rightChannelData[i] = Math.sin(t) * 0.1;
+            leftChannelData[i] = Math.sin(t) * 0.1;
+        }
+        soundBuffer.copyToChannel(leftChannelData, 0, 0);
+        soundBuffer.copyToChannel(rightChannelData, 1, 0);
+
+        soundSource.stop();
+        soundSource = context.createBufferSource();
+        soundSource.buffer = soundBuffer;
+        soundSource.connect(context.destination);
+        soundSource.loop = true;
+        soundSource.start(0);
+        startedAt = context.currentTime
+    }
+    function test3() {
+
+        t = 0;
+        // Fill the buffer with sin
+        for (var i = 0; i < sampleRate; i++) {
+            t += 0.1;
+            rightChannelData[i] = Math.sin(t) * 0.1;
+            leftChannelData[i] = Math.sin(t) * 0.1;
+        }
+        soundBuffer.copyToChannel(leftChannelData, 0, 0);
+        soundBuffer.copyToChannel(rightChannelData, 1, 0);
+
+        soundSource.stop();
+        soundSource = context.createBufferSource();
+        soundSource.buffer = soundBuffer;
+        soundSource.connect(context.destination);
+        soundSource.loop = true;
+        soundSource.start(0);
+        startedAt = context.currentTime
+    }
+
+    var rightChannelData = new Float32Array(sampleRate);
+    var leftChannelData = new Float32Array(sampleRate);
+
+    var WriteCursor = 0;
+    var region1Start = 0;
+    var region1End = 0;
+
+    var region2Start = 0;
+    var region2End = 0;
+    var PlayCursor = 0;
+    var LastPlayCursor = 0;
+    var FramesOfAudioLatency = 4;
+    // if our framerate is below 15 we'll start skipping / stuttering the sound.
+    var LatencySampleCount = FramesOfAudioLatency * (sampleRate / 30);
+    var SampleOffset = 10000; // How many samples ahead of the read cursor we write.
+
+    function loop(timestamp) {
+        if (global_exports_loaded) {
+            //time_start = performance.now()
+
+            var PlayCursor = 0;
+            var sampleCountToGet = 0;
+            if (soundSource) {
+
+                LastPlayCursor = PlayCursor;
+
+                PlayCursor = Math.floor(((context.currentTime - startedAt) * soundSource.playbackRate.value % 1.0) * sampleRate);
+
+                TargetCursor = (PlayCursor + (SampleOffset)) % sampleRate;
+
+                if (WriteCursor > TargetCursor) {
+                    //[wwwwwww--------wwwwwww]
+                    //0       ^      ^       21
+                    //      Play   Write
+
+                    region1Start = WriteCursor;
+                    region1End = sampleRate;
+
+                    region2Start = 0;
+                    region2End = TargetCursor;
+
+                }
+                else {
+                    //[-------wwwwwww-------]
+                    //0       ^      ^      21
+                    //      Write   Play
+                    region1Start = WriteCursor;
+                    region1End = TargetCursor;
+                    region2Start = 0;
+                    region2End = 0;
+                }
+
+                // Number of samples to get from the game.
+                sampleCountToGet += region1End - region1Start;
+                sampleCountToGet += region2End - region2Start;
+                WriteCursor = TargetCursor;
+            }
+
+
+            gamepads = navigator.getGamepads()
+            for (var i = 0; i < 4; i++) {
+                if (gamepads[i]) {
+                    X = gamepads[i].buttons[2].pressed;
+                    Y = gamepads[i].buttons[3].pressed;
+                    A = gamepads[i].buttons[0].pressed;
+                    B = gamepads[i].buttons[1].pressed;
+
+                    LeftBumper = gamepads[i].buttons[4].pressed;
+                    RightBumper = gamepads[i].buttons[5].pressed;
+                    LeftTrigger = gamepads[i].buttons[6].pressed;
+                    RightTrigger = gamepads[i].buttons[7].pressed;
+
+                    Up = gamepads[i].buttons[12].pressed;
+                    Down = gamepads[i].buttons[15].pressed;
+                    Left = gamepads[i].buttons[13].pressed;
+                    Right = gamepads[i].buttons[14].pressed;
+
+                    Start = gamepads[i].buttons[8].pressed;
+                    Back = gamepads[i].buttons[9].pressed;
+
+                    LeftStickX = gamepads[i].axes[0];
+                    LeftStickY = gamepads[i].axes[1];
+                    RightStickX = gamepads[i].axes[2];
+                    RightStickY = gamepads[i].axes[3];
+
+                    global_exports.UpdateGamepad(i,
+                        X, Y, A, B,
+                        Up, Down, Left, Right,
+                        LeftBumper, RightBumper, LeftTrigger, RightTrigger,
+                        Start, Back,
+                        LeftStickX, LeftStickY,
+                        RightStickX, RightStickY
+                    );
+                }
+            }
+
+            global_exports.Update(width, height, timestamp / 1000.0, sampleCountToGet, sampleRate)
+
+            BufferStart = global_exports.GetBackbufferPlacement();
+            for (i = 0; i < ImageData.data.length; i++) {
+                if (i % 4 == 3) {
+                    ImageData.data[i] = 255
+                }
+                else {
+                    ImageData.data[i] = memory[BufferStart + i]
+                }
+            }
+
+            // Write out samples to the sound buffer
+
+
+            memoryInt16 = new Int16Array(memoryThing.buffer, SoundBufferLocation, sampleRate)
+            //memoryInt16 = new Int16Array(memoryThing.buffer, BufferStart, sampleRate * 2)
+
+            var sampleIndex = 0;
+            for (var i = region1Start; i < region1End; i++) {
+                leftChannelData[i] = memoryInt16[sampleIndex] / 32767.0;
+                rightChannelData[i] = memoryInt16[sampleIndex + 1] / 32767.0;
+                sampleIndex++;
+                sampleIndex++;
+            }
+
+            for (var i = region2Start; i < region2End; i++) {
+                leftChannelData[i] = memoryInt16[sampleIndex] / 32767.0;
+                rightChannelData[i] = memoryInt16[sampleIndex + 1] / 32767.0;
+                sampleIndex++;
+                sampleIndex++;
+            }
+
+            soundBuffer.copyToChannel(leftChannelData, 0, 0);
+            soundBuffer.copyToChannel(rightChannelData, 1, 0);
+
+            // Fill the buffer with sin
+            //var rightChannelData = new Float32Array(sampleRate);
+            //var leftChannelData = new Float32Array(sampleRate);
+            //t = 0;
+            //for (var i = 0; i < sampleRate; i++) {
+            //    t += 0.05;
+            //    rightChannelData[i] = Math.sin(t) * 0.05;
+            //    leftChannelData[i] = Math.sin(t) * 0.05;
+            //}
+            //soundBuffer.copyToChannel(rightChannelData, 0, 0);
+            //soundBuffer.copyToChannel(leftChannelData, 1, 0);
+
+
+            //console.log(sampleCountToGet);
+            //AnyExecuting = false;
+            //for (var i = 0; i < 100; i++) {
+            //    console.log(global_exports.GetThreadExecuting(i));
+            //}
+            //if (AnyExecuting)
+            //    console.log("Something was executing!");
+
+            ctx.putImageData(ImageData, 0, 0)
+        }
+        window.requestAnimationFrame(loop)
+    }
+    window.requestAnimationFrame(loop)
+
+    function reportWindowSize() {
+        if (global_exports_loaded) {
+            width = window.innerWidth
+            height = window.innerHeight
+            maxwidth = 1920 / 2;
+            maxheight = 1080 / 2;
+            if (width > maxwidth) {
+                width = maxwidth
+            }
+            if (height > maxheight) {
+                height = maxheight
+            }
+
+            canvas.width = width
+            canvas.height = height
+            ImageData = ctx.getImageData(0, 0, width, height)
+            SoundBufferLocation = global_exports.GetSoundbufferPlacement(width, height, sampleRate);
+            MemorySize = global_exports.GetEndOfMemory(width, height, sampleRate)
+            memory = new Uint8ClampedArray(memoryThing.buffer, 0, MemorySize)
+            //memory = new Uint8ClampedArray(global_exports.memory.buffer, 0, MemorySize)
+            //memory2 = new SharedArrayBuffer(global_exports.memory.buffer, 0, MemorySize)
+
+        }
+    }
+
+    window.onresize = reportWindowSize;
+</script>
