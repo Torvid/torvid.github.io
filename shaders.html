@@ -44,125 +44,249 @@
             <hr/>
             
 
+<script>
+	function main()
+	{
+		const map = {
+			"block-props": "Block that contains properties that show up in the material. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Properties.html\">Properties block reference in ShaderLab</a>",
+			"block-prop-color": "Color parameter, gets multiplied with the texture in the surf function. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Properties.html\">Properties block reference in ShaderLab</a>",
+			"block-prop-maintex": "Main texture, gets sampled in the surf function. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Properties.html\">Properties block reference in ShaderLab</a>",
+			"block-prop-gloss": "Gloss parameter, used to describe how smooth/shiny the surface is. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Properties.html\">Properties block reference in ShaderLab</a>",
+			"block-prop-metallic": "Metallic parameter, used to describe how metallic the parameter is. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Properties.html\">Properties block reference in ShaderLab</a>",
+			
+			"block-shadername": "The name and path to the shader when selecting it for a material. Probably leave this the same as the filename for your own sanity. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/2020.1/Documentation/Manual/SL-ShadingLanguage.html\">Shading language used in Unity</a>",
+			
+			"block-surf": "This is the surf function, it's called once for every pixel, and returns information about the surface such as color, smoothness, normal vector, etc. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-SurfaceShaderExamples.html\">Surface Shader examples</a>",
+			
+			"block-vert": "This is the vert function, it's called once per vertex, and retruns a struct that's passed to the pixel shader. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-SurfaceShaderExamples.html\">Surface Shader examples</a>",
+			
+			"block-cgprogram": "This denotes the start and end of 'actual' HLSL shader code.",
+			
+			"block-inputstruct": "This struct is passed from the vertex function to the surf function, you can fill it in with whatever you want, and write to it in the vert function!",
+			"block-appdata": "This struct contains inputs from the mesh. Full list below. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-VertexProgramInputs.html\">Unity Documentation</a>",
+			"block-output": "This struct contains what the surf function returns (metallic, albedo, emissive, etc). Full list below.",
+			
+			"block-zwrite": "Whether the shader should write to depth of not. Generally \"On\" for opaque objects, and \"Off\" for transparent shaders. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/6000.1/Documentation/Manual/SL-ZWrite.html\">ZWrite in ShaderLab</a>",
+			"block-cull": "If back-face culling should be used. <br/><br/><a https://docs.unity3d.com/6000.1/Documentation/Manual/SL-Cull.html\">Cull in ShaderLab</a>",
+			"block-blend": "Blend mode to use This one is a bit more complicated. Examples: <br/>Blend SrcAlpha OneMinusSrcAlpha // Transparency<br/>Blend One One // Additive<br/>Blend DstColor Zero // Multiply<br/><br/><a https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html\">Blending in ShaderLab</a>",
+			"block-addshadow": "Makes shadows work correctly when vertexes are animated. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html\">Writing Surface Shaders</a>",
+			"block-dithercrossfade": "Makes dither-bleding LODs work correctly. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html\">Writing Surface Shaders</a>",
+			
+			"block-target": "Platform target. the numbers roughly correspond to the DirectX shader models, where 5.0 is DirectX 11. Leaving it at 5.0 is generally safe. <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/2020.1/Documentation/Manual/SL-ShaderCompileTargets.html\">Shader Compilation Target Levels</a>",
+			"block-tags": "Tags communicate metadata to unity about how the shader should be rendered, such as whether it's transparent or not, default draw order, etc  <br/><br/><a target=\"_blank\" href=\"https://docs.unity3d.com/560/Documentation/Manual/SL-SubShaderTags.html\">SubShader Tags</a>",
+		};
+		var clicked = ""
+		var highlighted = ""
+		function click(x)
+		{
+			clicked = x;
+			setState();
+		}
+		function highlight(x)
+		{
+			highlighted = x;
+			setState();
+		}
+		function unhighlight(x)
+		{
+			highlighted = "";
+			setState();
+		}
+		function setState()
+		{
+			const blockElements = Array.from(document.querySelectorAll("*")).filter(el => el.tagName.toLowerCase().startsWith("block-"));
+			blockElements.forEach((node) =>
+			{
+				node.style.color = node.style.originalColor;
+				if(clicked == node.tagName.toLowerCase())
+					node.style.color = "white";
+				else if(highlighted == node.tagName.toLowerCase())
+					node.style.color = "lightgrey";
+					
+				const node2 = document.querySelector('info-area');
+				node2.innerHTML = map[clicked]
+				//node2.hidden = false;
+			})
+		}
+		const blockElements = Array.from(document.querySelectorAll("*")).filter(el => el.tagName.toLowerCase().startsWith("block-"));
+		blockElements.forEach((node) => {
+			console.log(node);
+			node.style.display="inline"
+			node.style.originalColor = node.style.color;
+			node.addEventListener("mouseover", function(){highlight(node.tagName.toLowerCase())});
+			node.addEventListener("mouseout", function(){unhighlight(node.tagName.toLowerCase())});
+			node.addEventListener("click", function(){click(node.tagName.toLowerCase())});
+		})
+}
+</script>
+
+<style>
+info-area
+{
+	width: 50%;
+	float: right;
+	background-color: #1f1f1f;
+	height: 7em;
+	margin: 2em;
+	padding: 0.5em;
+	border-color: #8c8c8c;
+	border-width: 1px;
+	border-style: solid;
+}
+</style>
 
 		<CustomCenter>
 			<br/>
 			<p>
 			Write you a surface shader for great good. <br>
 			 <br>
-			Want to do something more than what the Standard Shader? <br>
-			Don't want to be lit all weird by Poyomi? <br>
-			You should try writing a surface shader! It's not as scary as it sounds. <br>
+			 
+			This assumes you already have some basic text programming knowledge. (functions, if statements, structs/classes, etc!) <br>
+			All text on this page is public domain, feel free to copy/paste it as you like! <br>
+			First off, link to main unity docs here: <a target=\"_blank\" href="https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html"> click </a> <br>
 			</p>
 			
-			Basics
-				Color
-				<pre>
-				<code>
-Shader "LearnSurface/Color"
+		<h2>Shader Anatomy!</h2>
+		A unity shader is split up into two main sections:  
+		<span style="color:#93C47D;">"shaderlab" (configuration) part</span>
+		, and 
+		<span style="color:#DD7E6B;"> "CG" (hlsl) part. </span>
+		Make a new shader and paste this in, to play around with.<br><br>
+		
+		If you are familiar with html/css/js work, you can think shaderlab as html, HLSL as JS.<br>
+		
+		<info-area>
+		info area
+		</info-area>
+<pre>
+<code>
+<span style="color:#93C47D;">
+<block-shadername>Shader "LearnSurface/Color"</block-shadername>
 {
-    Properties
-    {
-        _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0, 1)) = 0.5
-        _Metallic ("Metallic", Range(0, 1)) = 0.0
-    }
+    <block-props>Properties
+    {</block-props>
+        <block-prop-color>_Color ("Color", Color) = (1,1,1,1)</block-prop-color>
+        <block-prop-maintex>_MainTex ("Albedo (RGB)", 2D) = "white" {}</block-prop-maintex>
+        <block-prop-gloss>_Glossiness ("Smoothness", Range(0, 1)) = 0.5</block-prop-gloss>
+        <block-prop-metallic>_Metallic ("Metallic", Range(0, 1)) = 0.0</block-prop-metallic><block-props>
+    }</block-props>
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-
-        CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows vertex:vert
-        #pragma target 5.0
-        
+		
+        <block-zwrite>ZWrite On</block-zwrite>
+        <block-cull>Cull Back</block-cull>
+        <block-blend>Blend Off</block-blend>
+		
+        <block-cgprogram>CGPROGRAM</block-cgprogram></span><span style="color:#DD7E6B;">	
+        #pragma <block-surf>surface surf Standard fullforwardshadows</block-surf> <block-vert>vertex:vert</block-vert> <block-addshadow>addshadow</block-addshadow> <block-dithercrossfade>dithercrossfade</block-dithercrossfade>
+        <block-target>#pragma target 5.0</block-target>
+        <block-inputstruct>
         struct Input
         {
             float2 texcoord;
         };
-
-        sampler2D _MainTex;
-        float _Glossiness;
-        float _Metallic;
-        float4 _Color;
+		</block-inputstruct>
+        <block-prop-color>float4 _Color;			</block-prop-color>
+        <block-prop-maintex>sampler2D _MainTex; 	</block-prop-maintex>
+        <block-prop-gloss>float _Glossiness;  		</block-prop-gloss>
+        <block-prop-metallic>float _Metallic;    	</block-prop-metallic>
         
-        void vert(inout appdata_full app, out Input input)
-        {
-            UNITY_INITIALIZE_OUTPUT(Input, input);
-            input.texcoord = app.texcoord.xy;
-        }
+        <block-vert>void vert(</block-vert><block-appdata>inout appdata_full app</block-appdata>, <block-inputstruct>out Input input</block-inputstruct><block-vert>)
+        {</block-vert>
+            <block-inputstruct>UNITY_INITIALIZE_OUTPUT(Input, input);</block-inputstruct>
+            <block-inputstruct>input.texcoord</block-inputstruct> = <block-appdata>app.texcoord.xy;</block-appdata>
+        <block-vert>}</block-vert>
 
-        void surf(Input input, inout SurfaceOutputStandard o)
-        {
-            o.Albedo = tex2D(_MainTex, input.texcoord).rgb * _Color.rgb;
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-        }
-        ENDCG
+        <block-surf>void surf(</block-surf><block-inputstruct>Input input</block-inputstruct>, <block-output>inout SurfaceOutputStandard o</block-output><block-surf>)
+        {</block-surf>
+            <block-output>o.Albedo</block-output> = <block-prop-maintex>tex2D(_MainTex, </block-prop-maintex><block-inputstruct>input.texcoord</block-inputstruct><block-prop-maintex>).rgb </block-prop-maintex>*<block-prop-color> _Color.rgb;</block-prop-color>
+            <block-output>o.Smoothness</block-output> = <block-prop-gloss>_Glossiness;</block-prop-gloss>
+            <block-output>o.Metallic</block-output> = <block-prop-metallic>_Metallic;</block-prop-metallic>
+            <block-output>o.Normal</block-output> = float3(0, 0, 1);
+        <block-surf>}</block-surf></span><span style="color:#93C47D;">	
+        <block-cgprogram>ENDCG</block-cgprogram>
     }
     FallBack "Diffuse"
 }
+</span>
 
 				</code>
-				</pre>
 				
+				<code>
+
+struct appdata_full
+{
+    float4 vertex : POSITION;
+    float4 tangent : TANGENT;
+    float3 normal : NORMAL;
+    float4 color : COLOR;
+    float4 texcoord : TEXCOORD0;
+    float4 texcoord1 : TEXCOORD1;
+    float4 texcoord2 : TEXCOORD2;
+    float4 texcoord3 : TEXCOORD3;
+    float4 texcoord4 : TEXCOORD4;
+    float4 texcoord5 : TEXCOORD5;
+};
+
+struct Input
+{
+    float3 viewDir;
+    float4 screenPos;
+    float3 worldPos;
+    float3 worldRefl;
+    float3 worldNormal;
+};
+
+struct SurfaceOutputStandard
+{
+    float3 Albedo;      // Base (diffuse or specular) color
+    float3 Normal;      // Tangent space normal, if written
+    float3 Emission;    // Emission color
+    float Metallic;     // 0 = non-metal, 1 = metal
+    float Smoothness;   // 0=  rough, 1 = smooth
+    float Occlusion;    // Occlusion (default 1)
+    float Alpha;        // Alpha for transparencies
+};
+
+				</code>
+				
+				<pre>
+				
+			General
 				Normal Mapping
-				
 				Detail Normals
-				
 				Emission
-				
 				Lit Toon
-			
 				Vertex Function
-				
 				Cutout
-				
 				Transparent
-				
 				Transparent Texture
-				
 				Two sided
-				
 				Fresnel effect
-				
 				Fresnel effect with normal map
-				
 				Texture Scrolling
 				
 			Advanced
 				Scene Depth
-				
 				Iridescence
-				
 				RGB -> HSV -> RGB
-				
 				Depth To Distance / Depth To Linear
-				
 				Cutout Sphere
-				
 				Vertex Wave
-				
 				Distortion
-				
 				Dissolve (with emission, cutout sphere)
-				
 				LCD
 				
 			Audiolink
 				Pulsing emissive
-				
 				Pulsing Emissive with time offset
-				
 				Flowing emissive
-				
 				Spectrogram
-				
 				Stereo bars
 			
 			Functions
 				Texture Sampling
-			
 				World position
 				Local position
 				Camera Vector
@@ -174,22 +298,27 @@ Shader "LearnSurface/Color"
 				Vertex Index
 				ObjectPosition
 				GetObjectForward
-				
 				time
 				Vertex Color
 				
 			Effects
 				Flowmap
 				
+				</pre>
 				
 			
+				</pre>
 		</CustomCenter>
 		
 		<script src="/lightbox.js"></script>
+		
+<script>
+main();
+</script>
         
             <hr/>
             <CustomCenter>
-                Last updated 2024-10-31<br/>
+                Last updated 2025-07-24<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
