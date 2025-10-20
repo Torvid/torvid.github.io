@@ -135,29 +135,35 @@ info-area
 }
 </style>
 
-		<CustomCenter>
-			<br/>
-			<p>
-			Write you a surface shader for great good. <br>
-			 <br>
-			 
-			This document assumes you already have some basic text programming knowledge. (variables, if statements, functions, structs/classes, etc!) <br>
-			All text on this page is public domain, feel free to copy/paste it as you like! <br>
-			First off, link to main unity docs here: <a target=\"_blank\" href="https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html"> click </a> <br>
-			</p>
-			
-		<h2>Shader Anatomy!</h2>
-		A unity shader is split up into two main sections:  
-		<span style="color:#93C47D;">"shaderlab" (configuration) part</span>
-		, and 
-		<span style="color:#DD7E6B;"> "CG" (hlsl) part. </span>
-		Make a new shader and paste this in, to play around with.<br><br>
+
+<style>
+code_c{display:block;background:#1e1e1e;color:#dcdcdc;font:13px/1.5 monospace;padding:12px;border-radius:8px;white-space:pre;overflow:auto}
+.kw{color:#569cd6}.ty{color:#4ec9b0}.st{color:#ce9178}.co{color:#6a9955}.nu{color:#b5cea8}.pp{color:#9cdcfe}.hd{color:#d7ba7d}
+</style>
+
+	<CustomCenter>
+		<br/>
+		<p>
+		Write you a surface shader for great good. <br>
+		 <br>
+		 
+		This document assumes you already have some basic text programming knowledge. (variables, if statements, functions, structs/classes, etc!) <br>
+		All text on this page is public domain, feel free to copy/paste it as you like! <br>
+		First off, link to main unity docs here: <a target=\"_blank\" href="https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html"> click </a> <br>
+		</p>
 		
-		If you are familiar with html/css/js work, you can think shaderlab as html, HLSL as JS.<br>
-		
-		<info-area>
-		info area
-		</info-area>
+	<h2>Shader Anatomy!</h2>
+	A unity shader is split up into two main sections:  
+	<span style="color:#93C47D;">"shaderlab" (configuration) part</span>
+	, and 
+	<span style="color:#DD7E6B;"> "CG" (hlsl) part. </span>
+	Make a new shader and paste this in, to play around with.<br><br>
+	
+	If you are familiar with html/css/js work, you can think shaderlab as html, HLSL as JS.<br>
+	
+	<info-area>
+	info area
+	</info-area>
 <pre>
 <code>
 <span style="color:#93C47D;">
@@ -211,10 +217,12 @@ info-area
 }
 </span>
 
-				</code>
-				
-				<code>
+</code>
+</pre>
 
+
+This is the input struct that goes into the vertex shader! It's got a bunch of fun stuff like UVs, vertex color, normal, etc.
+<code_c>
 struct appdata_full
 {
     float4 vertex : POSITION;
@@ -228,6 +236,289 @@ struct appdata_full
     float4 texcoord4 : TEXCOORD4;
     float4 texcoord5 : TEXCOORD5;
 };
+</code_c>
+
+This is the output struct that's returned from the pixel shader, fill it in with color, metallic, normal, etc for unity's lighting to use!
+<code_c>
+struct SurfaceOutputStandard
+{
+    float3 Albedo;      // Base Color
+    float3 Normal;      // Tangent space normal
+    float3 Emission;    // Emission color
+    float Metallic;     // 1 = metallic 0 = non-metallic
+    float Smoothness;   // 0 = rough 1 = smooth
+    float Occlusion;    // Ambient Occlusion
+    float Alpha;        // Opacity value, 1 = opaque, 0 = transparent
+};
+</code_c>
+
+magic global variables
+https://docs.unity3d.com/6000.2/Documentation/Manual/SL-UnityShaderVariables.html
+<code_c>
+// World space position of the camera.
+_WorldSpaceCameraPos
+
+// World space location of the object
+mul(unity_ObjectToWorld, float4(0, 0, 0, 1))
+
+// Object right
+normalize(mul(unity_ObjectToWorld, float4(1, 0, 0, 0)))
+
+// Object up
+normalize(mul(unity_ObjectToWorld, float4(0, 1, 0, 0)))
+
+// Object forwarad
+normalize(mul(unity_ObjectToWorld, float4(0, 0, 1, 0)))
+
+// Camera right
+mul(UNITY_MATRIX_V, float4(1, 0, 0, 0))
+
+// Camera up
+mul(UNITY_MATRIX_V, float4(0, 1, 0, 0))
+
+// Camera forwarad
+mul(UNITY_MATRIX_V, float4(0, 0, 1, 0))
+
+// time in seconds since the game started
+_Time.g
+
+// Current model * view * projection matrix.
+UNITY_MATRIX_MVP
+
+// Current model matrix.
+unity_ObjectToWorld
+
+// Inverse of current world matrix.
+unity_WorldToObject
+</code_c>
+
+Whether the object should write to depth, IE if it should obscure things behind it or not!
+https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZWrite.html
+<code_c>
+// Hide objects it it's in front
+ZWrite On
+
+// Let other objects, even ones behind, draw on top of us, based on draw queue order.
+ZWrite Off
+</code_c>
+
+Ztest, Whether a pixel should be discared or drawn to the screen based on the "current" depth value.
+There are more than I listed here but these are the useful ones.
+https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZTest.html
+<code_c>
+// Always draw the obejct, ignoring if it's behind something or not.
+ZTest Always
+
+// Default value, draws the object if it's *closer* than what's alreayd there
+ZTest Less
+
+// Draws the object only if it's *behind* something. (good for stuff like outlines to see things through walls)
+ZTest GEqual
+</code_c>
+
+
+Blend parameter describes how the object should blend with the backrgound when it's drawn. (Additive, etc)
+The docs for this is split across two pages for some reason
+https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html
+https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Blend.html
+<code_c>
+// Traditional transparency
+Blend SrcAlpha OneMinusSrcAlpha
+
+// Premultiplied transparency
+Blend One OneMinusSrcAlpha
+
+// Additive
+Blend One One
+
+// Soft Additive
+Blend OneMinusDstColor One
+
+// Multiplicative
+Blend DstColor Zero
+
+// 2x Multiplicative
+Blend DstColor SrcColor
+</code_c>
+
+Back face / Front face culling
+https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Cull.html
+<code_c>
+// Standard backface culling, hide back faces
+Cull Back
+
+// Draw the object two-sided!
+Cull Off
+
+// Hide front faces
+Cull Front
+
+</code_c>
+
+Shader properties
+the general structure is like this: 
+[optional: attribute] name("display text in Inspector", type name) = default value
+
+<code_c>
+// float
+_ExampleName ("Float display name", Float) = 0.5
+
+// float with slider
+_ExampleName ("Float with range", Range(0.0, 1.0)) = 0.5
+
+// color 
+_ExampleName("Example color", Color) = (.25, .5, .5, 1)
+
+// vector
+_ExampleName ("Example vector", Vector) = (.25, .5, .5, 1)
+
+// texture 2D 
+_ExampleName ("Texture2D display name", 2D) = "" {}
+
+// texture 2d with default texture. the default textures are: "white", "black", "gray", "red", "bump"
+_ExampleName ("Texture2D display name", 2D) = "red" {}
+
+// texture 2d array
+_ExampleName ("Texture2DArray display name", 2DArray) = "" {}
+
+// texture 3d
+_ExampleName ("Texture3D", 3D) = "" {}
+
+// cubemap
+_ExampleName ("Cubemap", Cube) = "" {}
+
+// cubemap array
+_ExampleName ("CubemapArray", CubeArray) = "" {}
+
+// intiger
+_ExampleName ("Integer display name", Integer) = 1
+
+// int (float that pretends to be an intiger)
+_ExampleName ("Int display name", Int) = 1
+
+// bool (see Material Property Attributes)
+[Toggle] _ExampleName ("Float display name", Float) = 0.5
+
+</code_c>
+
+
+Material property attributes
+https://docs.unity.cn/2021.1/Documentation/Manual/SL-Properties.html
+<code_c>
+
+// makes it be gamma corrected??
+[Gamma]
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// makes the color show as HDR insead of 8-bit 0-255
+[HDR]
+_MyParameterHere ("_MyParameterHere", Color) = (1,1,1,1)
+
+// hide the property from the inspector
+[HideInInspector]
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// indicates that it's the main texture (for scripting)
+[MainTexture]
+_MainTex ("MainTex", 2D) = "black" {}
+
+// indicates that it's the main color (for scripting)
+[MainColor]
+_MyParameterHere ("_MyParameterHere", Color) = (1,1,1,1)
+
+// removes the scale and offset paramters from the texture
+[NoScaleOffset]
+_MainTex ("MainTex", 2D) = "black" {}
+
+// Indicates that it's a normal map and unity will give you a warning if you put a non-normalmap texture
+[Normal]
+_MainTex ("MainTex", 2D) = "black" {}
+
+</code_c>
+
+Even more property attributes!
+https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html
+
+<code_c>
+// header! shows up nicely
+[Header(A group of things!)]
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// adds a pow of 3.0 (or any number) to the value in the UI
+[PowerSlider(3.0)] 
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// makes the float slider snap to int values
+[IntRange] 
+_MyParameterHere ("_MyParameterHere", Range(0, 10)) = 0.0
+
+// adds some space between values
+[Space]
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// adds 50 pixels of space between values
+[Space(50)]
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// turns bool into a checkbox toggle
+[Toggle] 
+_MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
+
+// makes an enum, like a dropdown, with specific with assigned values!
+// in the shader code, with this, you can do "Blend One _MyBlendValue"
+// This can be used to make things like blend mode, two-sided, etc configurable per instance!
+[Enum(One, 1, SrcAlpha, 5)] 
+_MyBlendValue ("_MyBlendValue", Float) = 0
+
+// same thing
+[Enum(UnityEngine.Rendering.BlendMode)] 
+_Blend ("Blend mode", Float) = 1
+
+// same thing, but for blend mode
+[KeywordEnum(Front, Back, None)] 
+_Cull ("Overlay mode", Float) = 1
+
+</code_c>
+
+<script>
+document.querySelectorAll("code_c").forEach(el=>{
+  const esc=s=>s.replace(/[&<>]/g,c=>c=="&"?"&amp;":c=="<"?"&lt;":"&gt;");
+  const store=[];
+  // 1) Protect strings & comments with tokens
+  let src=el.textContent.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,
+    m=>(store.push(m),"\u0000"+(store.length-1)+"\u0000"));
+  // 2) Escape HTML
+  src=esc(src);
+  // 3) Split by tokens; highlight only non-token segments
+  const parts=src.split(/\u0000(\d+)\u0000/);
+  for(let i=0;i<parts.length;i+=2){
+    let s=parts[i];
+    s=s.replace(/(^|\n)(\s*#\s*\w+)/g,'$1<span class=pp>$2</span>');                               // preproc
+    s=s.replace(/(#\s*include\s+)&lt;([^&]+)&gt;/g,'$1<span class=hd>&lt;$2&gt;</span>');           // <header>
+    s=s.replace(/\b(0x[\da-fA-F]+|\d+(?:\.\d+)?(?:ll|LL|u|U|l|L|f|F)?)\b/g,'<span class=nu>$1</span>'); // numbers
+    s=s.replace(/\b(int|int2|int3|int4|char|float|float2|float3|float4|double|void|long|short|unsigned|signed|size_t|ssize_t|uint\d*_t|int\d*_t|bool)\b/g,'<span class=ty>$1</span>');
+    s=s.replace(/\b(if|else|for|while|do|switch|case|Blend|Ztest|ZWrite|Cull|default|break|continue|return|struct|typedef|enum|static|const|volatile|extern|register|goto|sizeof)\b/g,'<span class=kw>$1</span>');
+    parts[i]=s;
+  }
+  // 4) Rebuild while restoring protected chunks
+  let out="";
+  for(let i=0;i<parts.length;i++){
+    if(i%2==0) out+=parts[i];
+    else{
+      const t=store[+parts[i]], cls=/^\/[/*]/.test(t)?'co':'st';
+      out+=`<span class="${cls}">${esc(t)}</span>`;
+    }
+  }
+  el.innerHTML=out.trim();
+});
+</script>
+
+
+
+
+
+<code>
+
 
 struct Input
 {
@@ -238,21 +529,11 @@ struct Input
     float3 worldNormal;
 };
 
-struct SurfaceOutputStandard
-{
-    float3 Albedo;      // Base (diffuse or specular) color
-    float3 Normal;      // Tangent space normal, if written
-    float3 Emission;    // Emission color
-    float Metallic;     // 0 = non-metal, 1 = metal
-    float Smoothness;   // 0=  rough, 1 = smooth
-    float Occlusion;    // Occlusion (default 1)
-    float Alpha;        // Alpha for transparencies
-};
+</code>
 
-				</code>
-				
-				<pre>
-				
+
+<pre>
+
 General
     Normal Mapping
     Detail Normals
@@ -306,8 +587,6 @@ Effects
 	
 	</pre>
 	
-
-				</pre>
 		</CustomCenter>
 		
 		<script src="/lightbox.js"></script>
@@ -318,7 +597,7 @@ main();
         
             <hr/>
             <CustomCenter>
-                Last updated 2025-09-09<br/>
+                Last updated 2025-10-18<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
