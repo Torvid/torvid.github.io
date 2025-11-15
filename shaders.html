@@ -226,7 +226,10 @@ code_c{display:block;background:#1e1e1e;color:#dcdcdc;font:13px/1.5 monospace;pa
 </code>
 </pre>
 <br/>
-This is the input struct that goes into the vertex shader! It's got a bunch of fun stuff like UVs, vertex color, normal, etc.<br/>
+<h2>Unity HLSL stuff Reference</h2>
+<h3>Input Struct</h3>
+Appdata, or appdata_full, is the struct containing per-vertex data, such as UVs, vertex color, normal, etc.<br/>
+<br/>
 <code_c>
 struct appdata_full
 {
@@ -243,7 +246,9 @@ struct appdata_full
 };
 </code_c>
 <br/>
-This is the output struct that's returned from the pixel shader, fill it in with color, metallic, normal, etc for unity's lighting to use!<br/>
+<h3>Surface Output Struct</h3>
+Surface Output is the struct you create and return from the 'surf' function, it contains parameters like color, normal, metallness, for unity to use in its lighting.<br/>
+<br/>
 <code_c>
 struct SurfaceOutputStandard
 {
@@ -257,8 +262,10 @@ struct SurfaceOutputStandard
 };
 </code_c>
 <br/>
-magic global variables<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-UnityShaderVariables.html"> unity documentation </a><br/>
+<h3>Magic Global Variables</h3>
+When writing shaders, there are some usful magic variables unity provide, such as the position of the camera in the scene, time, the current object's position, etc.<br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-UnityShaderVariables.html"> Built-in shader variables reference </a><br/>
+<br/>
 <code_c>
 // World space position of the camera.
 _WorldSpaceCameraPos
@@ -296,9 +303,12 @@ unity_ObjectToWorld
 // Inverse of current world matrix.
 unity_WorldToObject
 </code_c>
+<h2>Unity Shaderlab flags Reference</h2>
+<h3>ZWrite</h3>
+The ZWRite flag controls to depth, IE if it should obscure things that are behind it or not!<br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZWrite.html"> ZWrite command in ShaderLab reference </a><br/>
 <br/>
-Whether the object should write to depth, IE if it should obscure things behind it or not!<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZWrite.html"> unity documentation </a>
+<br/>
 <code_c>
 // Hide objects it it's in front
 ZWrite On
@@ -306,10 +316,13 @@ ZWrite On
 // Let other objects, even ones behind, draw on top of us, based on draw queue order.
 ZWrite Off
 </code_c>
-<br/>
-Ztest, Whether a pixel should be discared or drawn to the screen based on the "current" depth value.<br/>
+
+<h3>ZTest</h3>
+Ztest, Whether a pixel should be discared based on the "current" depth value at that pixel.<br/>
 There are more than I listed here but these are the useful ones.<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZTest.html"> unity documentation </a><br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZTest.html"> ZTest command in ShaderLab reference </a><br/>
+<br/>
+<br/>
 <code_c>
 // Always draw the obejct, ignoring if it's behind something or not.
 ZTest Always
@@ -321,10 +334,12 @@ ZTest Less
 ZTest GEqual
 </code_c>
 <br/>
+<h3>Blend</h3>
 Blend parameter describes how the object should blend with the backrgound when it's drawn. (Additive, etc)<br/>
 The docs for this is split across two pages for some reason<br/>
-<a href="https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html"> unity documentation </a><br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Blend.html"> unity documentation </a><br/>
+<a href="https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html"> ShaderLab: Blending </a><br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Blend.html"> Blend command in ShaderLab reference </a><br/>
+<br/>
 <code_c>
 // Traditional transparency
 Blend SrcAlpha OneMinusSrcAlpha
@@ -345,8 +360,10 @@ Blend DstColor Zero
 Blend DstColor SrcColor
 </code_c>
 <br/>
-Back face / Front face culling<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Cull.html"> unity documentation </a><br/>
+<h3>Cull</h3>
+Cull controls Back-face culling / Front face culling. IE whether to draw the front face or back face.<br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Cull.html"> Cull command in ShaderLab reference </a><br/>
+<br/>
 <code_c>
 // Standard backface culling, hide back faces
 Cull Back
@@ -359,7 +376,11 @@ Cull Front
 
 </code_c>
 <br/>
-Shader properties and how to use them!<br/>
+<h3>Properties</h3>
+Properties show up in the mateiral UI, Below I provide a complete-ish list of properties and how to use them in the CG block<br/>
+<a href="https://docs.unity3d.com/2020.1/Documentation/Manual/SL-Properties.html"> ShaderLab: Properties </a><br/>
+<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Properties.html"> Properties block reference in ShaderLab </a><br/>
+<br/>
 <code_c>
 // float
 _ExampleName ("Float display name", Float) = 0.5
@@ -377,18 +398,22 @@ float4 _ExampleName;
 _ExampleName ("Example vector", Vector) = (.25, .5, .5, 1)
 float4 _ExampleName;
 
-// intiger
+// integer
 _ExampleName ("Integer display name", Integer) = 1
+int _ExampleName;
 
-// int (float that pretends to be an intiger)
+// int (float that pretends to be an integer)
 _ExampleName ("Int display name", Int) = 1
+int _ExampleName;
 
 // bool (see Material Property Attributes)
 [Toggle] _ExampleName ("Float display name", Float) = 0.5
 
 </code_c>
 <br/>
-I split up Texture shader properties, because they are extra complicated!<br/>
+<h3>Texture Properties</h3>
+Texture properties are more complicated, continuted from the previous section<br/>
+<br/>
 <code_c>
 // texture 2D 
 _ExampleName ("Texture2D display name", 2D) = "" {}
@@ -443,8 +468,11 @@ float4 result = texCUBEARRAY(_ExampleName, float4(dir, slice));
 
 </code_c>
 <br/>
-Material property attributes<br/>
-<a href="https://docs.unity.cn/2021.1/Documentation/Manual/SL-Properties.html"> unity documentation </a><br/>
+<h3>Property Attributes</h3>
+Property Attributes are modifiers you can put on attributes to change their behaviour and look in the UI!<br/>
+<a href="https://docs.unity.cn/2021.1/Documentation/Manual/SL-Properties.html"> ShaderLab: defining material properties </a><br/>
+<a href="https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html"> MaterialPropertyDrawer </a><br/>
+<br/>
 <code_c>
 
 // makes it be gamma corrected??
@@ -471,11 +499,6 @@ _MainTex ("MainTex", 2D) = "black" {}
 [Normal]
 _BumpTex ("MainTex", 2D) = "black" {}
 
-</code_c>
-<br/>
-Even more property attributes!<br/>
-<a href="https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html"> unity documentation </a><br/>
-<code_c>
 // header! shows up nicely
 [Header(A group of things!)]
 _MyParameterHere ("_MyParameterHere", Float) = 0.0
@@ -516,7 +539,9 @@ _Cull ("Overlay mode", Float) = 1
 
 </code_c>
 <br/>
-Unity standard shader property names, use these if you want your shader fallback to look right!<br/>
+<h3>Standard Names</h3>
+The unity standard shader has some standardized names for properties, use these if you want your shader fallback to look right!<br/>
+<br/>
 <code_c>
 _Color ("Color", Color) = (1, 1, 1, 1)
 _MainTex ("Albedo", 2D) = "white" { }
