@@ -138,38 +138,38 @@ info-area
 
 <style>
 code_c{display:block;background:#1e1e1e;color:#dcdcdc;font:13px/1.5 monospace;padding:12px;border-radius:8px;white-space:pre;overflow:auto}
-.kw{color:#569cd6}.ty{color:#4ec9b0}.st{color:#ce9178}.co{color:#6a9955}.nu{color:#b5cea8}.pp{color:#9cdcfe}.hd{color:#d7ba7d}
+.kw{color:#569cd6}.ty{color:#4ec9b0}.st{color:#ce9178}.co{color:#6a9955}.nu{color:#b5cea8}.pp{color:#9cdcfe}.hd{color:#d7ba7d}.fn{color:#DCDCAA}
 </style>
 
-	<CustomCenter>
-		<br/>
-		<p>
-		Write you a surface shader for great good. <br>
-		 <br>
-		 
-		This document assumes you already have some basic text programming knowledge. (variables, if statements, functions, structs/classes, etc!) <br>
-		All text on this page is public domain, feel free to copy/paste it as you like! <br>
-		
-		
-		First off, a list of resoucres I found useful when learning this stuff myself!
-		<a target="_blank" href="https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html"> Unity Documentation </a> <br>
-		<a target="_blank" href="https://github.com/cnlohr/shadertrixx"> Shadertrixx by cnlohr & co </a> <br>
-		<a target="_blank" href="https://developer.download.nvidia.com/cg/index_stdlib.html"> Nvidia CG functions documentation (note that CG and HLSL are different but similar)</a> <br>
-		
-		</p>
-		
-	<h2>Shader Anatomy!</h2>
-	A unity shader is split up into two main sections:  
-	<span style="color:#93C47D;">"shaderlab" (configuration) part</span>
-	, and 
-	<span style="color:#DD7E6B;"> "CG" (hlsl) part. </span>
-	Make a new shader and paste this in, to play around with.<br><br>
-	
-	If you are familiar with html/css/js, you can kind of think ShaderLab as HTML, HLSL as Javascript.<br>
-	
-	<info-area>
-	info area (Click on something to show info about it!)
-	</info-area>
+<CustomCenter>
+    <br />
+    <p>
+        Write you a surface shader for great good. <br>
+        <br>
+
+        This document assumes you already have some basic text programming knowledge. (variables, if statements, functions, structs/classes, etc!) <br>
+        All text on this page is public domain, feel free to copy/paste it as you like! <br>
+
+
+        First off, a list of resoucres I found useful when learning this stuff myself!
+        <a target="_blank" href="https://docs.unity3d.com/560/Documentation/Manual/SL-SurfaceShaders.html"> Unity Documentation </a> <br>
+        <a target="_blank" href="https://github.com/cnlohr/shadertrixx"> Shadertrixx by cnlohr & co </a> <br>
+        <a target="_blank" href="https://developer.download.nvidia.com/cg/index_stdlib.html"> Nvidia CG functions documentation (note that CG and HLSL are different but similar)</a> <br>
+
+    </p>
+
+    <h2>Shader Anatomy!</h2>
+    A unity shader is split up into two main sections:
+    <span style="color:#93C47D;">"shaderlab" (configuration) part</span>
+    , and
+    <span style="color:#DD7E6B;"> "CG" (hlsl) part. </span>
+    Make a new shader and paste this in, to play around with.<br><br>
+
+    If you are familiar with html/css/js, you can kind of think ShaderLab as HTML, HLSL as Javascript.<br>
+
+    <info-area>
+        info area (Click on something to show info about it!)
+    </info-area>
 <pre>
 <code>
 <span style="color:#93C47D;">
@@ -225,70 +225,142 @@ code_c{display:block;background:#1e1e1e;color:#dcdcdc;font:13px/1.5 monospace;pa
 
 </code>
 </pre>
-<br/>
-<h2>Unity HLSL stuff Reference</h2>
-<h3>Input Struct</h3>
-Appdata, or appdata_full, is the struct containing per-vertex data, such as UVs, vertex color, normal, etc.<br/>
-<br/>
-<code_c>
+
+
+    <h2>Examples!</h2>
+    <h3>Triplanar mapping for blockouts</h3>
+    <code_c>
+Shader "LearnSurface/BoxGrid"
+{
+    Properties
+    {
+        _Color ("Color", Color) = (1,1,1,1)
+        [NoScaleOffset] _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _Glossiness ("Smoothness", Range(0, 1)) = 0.5
+        _Metallic ("Metallic", Range(0, 1)) = 0.0
+        _Tiling ("_Tiling", Range(0, 1)) = 1.0
+
+        [PowerSlider(3.0)] _Sharpness ("_Sharpness", Range(10, 150)) = 1.0
+    }
+    SubShader
+    {
+        Tags { "RenderType"="Opaque" }
+
+        ZWrite On
+        Cull Back
+        Blend Off
+
+        CGPROGRAM
+        #pragma surface surf Standard fullforwardshadows vertex:vert addshadow dithercrossfade
+        #pragma target 5.0
+
+        struct Input
+        {
+            float2 texcoord;
+            float3 worldPos;
+            float3 normal;
+        };
+
+        float4 _Color;
+        sampler2D _MainTex;
+        float _Glossiness;
+        float _Metallic;
+        float _Tiling;
+        float _Sharpness;
+
+        void vert(inout appdata_full app, out Input input)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, input);
+            input.texcoord = app.texcoord.xy;
+            input.normal = normalize(UnityObjectToWorldNormal(app.normal));
+        }
+
+        void surf(Input input, inout SurfaceOutputStandard o)
+        {
+            float xDiff = tex2D(_MainTex, input.worldPos.zy * _Tiling * float2(sign(input.normal.x), 1)).r;
+            float yDiff = tex2D(_MainTex, input.worldPos.xz * _Tiling * float2(sign(input.normal.y), 1)).r;
+            float zDiff = tex2D(_MainTex, input.worldPos.xy * _Tiling * float2(-sign(input.normal.z), 1)).r;
+            float3 blendWeights = pow(abs(input.normal), _Sharpness.xxx);
+            blendWeights = blendWeights / (blendWeights.x + blendWeights.y + blendWeights.z);
+            blend = (xDiff * blendWeights.x) + (yDiff * blendWeights.y) + (zDiff * blendWeights.z);
+
+            o.Metallic = _Metallic;
+            o.Smoothness = _Glossiness;
+            o.Albedo = _Color.rgb * 2 + blend;
+            o.Occlusion = 1;
+            o.Alpha = 1;
+            o.Normal = float3(0, 0, 1);
+        }
+        ENDCG
+    }
+    FallBack "Diffuse"
+}
+
+    </code_c>
+    <br />
+    <h2>Unity HLSL stuff Reference</h2>
+    <h3>Input Struct</h3>
+    Appdata, or appdata_full, is the struct containing per-vertex data, such as UVs, vertex color, normal, etc.<br />
+    <br />
+    <code_c>
 struct appdata_full
 {
-    float4 vertex : POSITION;
-    float4 tangent : TANGENT;
-    float3 normal : NORMAL;
-    float4 color : COLOR;
-    float4 texcoord : TEXCOORD0;
-    float4 texcoord1 : TEXCOORD1;
-    float4 texcoord2 : TEXCOORD2;
-    float4 texcoord3 : TEXCOORD3;
-    float4 texcoord4 : TEXCOORD4;
-    float4 texcoord5 : TEXCOORD5;
+	float4 vertex : POSITION;
+	float4 tangent : TANGENT;
+	float3 normal : NORMAL;
+	float4 color : COLOR;
+	float4 texcoord : TEXCOORD0;
+	float4 texcoord1 : TEXCOORD1;
+	float4 texcoord2 : TEXCOORD2;
+	float4 texcoord3 : TEXCOORD3;
+	float4 texcoord4 : TEXCOORD4;
+	float4 texcoord5 : TEXCOORD5;
 };
-</code_c>
-<br/>
-<h3>Surface Output Struct</h3>
-Surface Output is the struct you create and return from the 'surf' function, it contains parameters like color, normal, metallness, for unity to use in its lighting.<br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Surface Output Struct</h3>
+    Surface Output is the struct you create and return from the 'surf' function, it contains parameters like color, normal, metallness, for unity to use in its lighting.<br />
+    <br />
+    <code_c>
 struct SurfaceOutputStandard
 {
-    float3 Albedo;      // Base Color
-    float3 Normal;      // Tangent space normal
-    float3 Emission;    // Emission color
-    float Metallic;     // 1 = metallic 0 = non-metallic
-    float Smoothness;   // 0 = rough 1 = smooth
-    float Occlusion;    // Ambient Occlusion
-    float Alpha;        // Opacity value, 1 = opaque, 0 = transparent
+	float3 Albedo;      // Base Color
+	float3 Normal;      // Tangent space normal
+	float3 Emission;    // Emission color
+	float Metallic;     // 1 = metallic 0 = non-metallic
+	float Smoothness;   // 0 = rough 1 = smooth
+	float Occlusion;    // Ambient Occlusion
+	float Alpha;        // Opacity value, 1 = opaque, 0 = transparent
 };
-</code_c>
-<br/>
-<h3>Magic Global Variables</h3>
-When writing shaders, there are some usful magic variables unity provide, such as the position of the camera in the scene, time, the current object's position, etc.<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-UnityShaderVariables.html"> Built-in shader variables reference </a><br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Magic Global Variables</h3>
+    When writing shaders, there are some usful magic variables unity provide, such as the position of the camera in the scene, time, the current object's position, etc.<br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-UnityShaderVariables.html"> Built-in shader variables reference </a><br />
+    <br />
+    <code_c>
 // World space position of the camera.
 _WorldSpaceCameraPos
 
-// World space location of the object
+// World space object position, location of the object
 mul(unity_ObjectToWorld, float4(0, 0, 0, 1))
 
-// Object right
+// Object right vector
 normalize(mul(unity_ObjectToWorld, float4(1, 0, 0, 0)))
 
-// Object up
+// Object up vector
 normalize(mul(unity_ObjectToWorld, float4(0, 1, 0, 0)))
 
-// Object forwarad
+// Object forward vector
 normalize(mul(unity_ObjectToWorld, float4(0, 0, 1, 0)))
 
-// Camera right
+// Camera right vector
 mul(UNITY_MATRIX_V, float4(1, 0, 0, 0))
 
-// Camera up
+// Camera up vector
 mul(UNITY_MATRIX_V, float4(0, 1, 0, 0))
 
-// Camera forwarad
+// Camera forward vector
 mul(UNITY_MATRIX_V, float4(0, 0, 1, 0))
 
 // time in seconds since the game started
@@ -302,28 +374,47 @@ unity_ObjectToWorld
 
 // Inverse of current world matrix.
 unity_WorldToObject
-</code_c>
-<h2>Unity Shaderlab flags Reference</h2>
-<h3>ZWrite</h3>
-The ZWRite flag controls to depth, IE if it should obscure things that are behind it or not!<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZWrite.html"> ZWrite command in ShaderLab reference </a><br/>
-<br/>
-<br/>
-<code_c>
+
+// Local To World, transforms a position from local space to world space.
+mul(unity_ObjectToWorld, float4(my_local_pos, 1))
+
+// World Local, transforms a position from world space to local space.
+mul(unity_WorldToObject, float4(my_world_pos, 1))
+
+// Local To World No Scale, transforms a position from local space to world space, ignoring object scale.
+mul(unity_ObjectToWorld, float4(my_local_pos, 1))
+
+// World Local No Scale, transforms a position from world space to local space, ignoring object scale.
+mul(unity_WorldToObject, float4(my_world_pos, 1))
+
+// Local direction To World direction, transforms a vector from local space to world space.
+mul(unity_ObjectToWorld, float4(my_local_pos, 0))
+
+// World direction Local direction, transforms a vector from world space to local space.
+mul(unity_WorldToObject, float4(my_world_pos, 0))
+
+    </code_c>
+    <h2>Unity Shaderlab flags Reference</h2>
+    <h3>ZWrite</h3>
+    The ZWRite flag controls to depth, IE if it should obscure things that are behind it or not!<br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZWrite.html"> ZWrite command in ShaderLab reference </a><br />
+    <br />
+    <br />
+    <code_c>
 // Hide objects it it's in front
 ZWrite On
 
 // Let other objects, even ones behind, draw on top of us, based on draw queue order.
 ZWrite Off
-</code_c>
+    </code_c>
 
-<h3>ZTest</h3>
-Ztest, Whether a pixel should be discared based on the "current" depth value at that pixel.<br/>
-There are more than I listed here but these are the useful ones.<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZTest.html"> ZTest command in ShaderLab reference </a><br/>
-<br/>
-<br/>
-<code_c>
+    <h3>ZTest</h3>
+    Ztest, Whether a pixel should be discared based on the "current" depth value at that pixel.<br />
+    There are more than I listed here but these are the useful ones.<br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-ZTest.html"> ZTest command in ShaderLab reference </a><br />
+    <br />
+    <br />
+    <code_c>
 // Always draw the obejct, ignoring if it's behind something or not.
 ZTest Always
 
@@ -332,15 +423,15 @@ ZTest Less
 
 // Draws the object only if it's *behind* something. (good for stuff like outlines to see things through walls)
 ZTest GEqual
-</code_c>
-<br/>
-<h3>Blend</h3>
-Blend parameter describes how the object should blend with the backrgound when it's drawn. (Additive, etc)<br/>
-The docs for this is split across two pages for some reason<br/>
-<a href="https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html"> ShaderLab: Blending </a><br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Blend.html"> Blend command in ShaderLab reference </a><br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Blend</h3>
+    Blend parameter describes how the object should blend with the backrgound when it's drawn. (Additive, etc)<br />
+    The docs for this is split across two pages for some reason<br />
+    <a href="https://docs.unity3d.com/2018.4/Documentation/Manual/SL-Blend.html"> ShaderLab: Blending </a><br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Blend.html"> Blend command in ShaderLab reference </a><br />
+    <br />
+    <code_c>
 // Traditional transparency
 Blend SrcAlpha OneMinusSrcAlpha
 
@@ -358,13 +449,13 @@ Blend DstColor Zero
 
 // 2x Multiplicative
 Blend DstColor SrcColor
-</code_c>
-<br/>
-<h3>Cull</h3>
-Cull controls Back-face culling / Front face culling. IE whether to draw the front face or back face.<br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Cull.html"> Cull command in ShaderLab reference </a><br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Cull</h3>
+    Cull controls Back-face culling / Front face culling. IE whether to draw the front face or back face.<br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Cull.html"> Cull command in ShaderLab reference </a><br />
+    <br />
+    <code_c>
 // Standard backface culling, hide back faces
 Cull Back
 
@@ -373,15 +464,14 @@ Cull Off
 
 // Hide front faces
 Cull Front
-
-</code_c>
-<br/>
-<h3>Properties</h3>
-Properties show up in the mateiral UI, Below I provide a complete-ish list of properties and how to use them in the CG block<br/>
-<a href="https://docs.unity3d.com/2020.1/Documentation/Manual/SL-Properties.html"> ShaderLab: Properties </a><br/>
-<a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Properties.html"> Properties block reference in ShaderLab </a><br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Properties</h3>
+    Properties show up in the mateiral UI, Below I provide a complete-ish list of properties and how to use them in the CG block<br />
+    <a href="https://docs.unity3d.com/2020.1/Documentation/Manual/SL-Properties.html"> ShaderLab: Properties </a><br />
+    <a href="https://docs.unity3d.com/6000.2/Documentation/Manual/SL-Properties.html"> Properties block reference in ShaderLab </a><br />
+    <br />
+    <code_c>
 // float
 _ExampleName ("Float display name", Float) = 0.5
 float _ExampleName;
@@ -390,7 +480,7 @@ float _ExampleName;
 _ExampleName ("Float with range", Range(0.0, 1.0)) = 0.5
 float _ExampleName;
 
-// color 
+// color
 _ExampleName("Example color", Color) = (.25, .5, .5, 1)
 float4 _ExampleName;
 
@@ -409,13 +499,13 @@ int _ExampleName;
 // bool (see Material Property Attributes)
 [Toggle] _ExampleName ("Float display name", Float) = 0.5
 
-</code_c>
-<br/>
-<h3>Texture Properties</h3>
-Texture properties are more complicated, continuted from the previous section<br/>
-<br/>
-<code_c>
-// texture 2D 
+    </code_c>
+    <br />
+    <h3>Texture Properties</h3>
+    Texture properties are more complicated, continuted from the previous section<br />
+    <br />
+    <code_c>
+// texture 2D
 _ExampleName ("Texture2D display name", 2D) = "" {}
 sampler2D _ExampleName;
 float4 result = tex2D(_ExampleName, uv); // float2 uv coordinate
@@ -438,7 +528,7 @@ float4 result = tex2Dgrad(_ExampleName, uv, ddx(uv), ddy(uv));
 float4 result = _ExampleName.SampleGrad(sampler_ExampleName, uv, ddx(uv), ddy(uv));
 
 // grab just one pixel (u, v, mip)
-float4 result = _ExampleName.Load(int3(uv, 0)); 
+float4 result = _ExampleName.Load(int3(uv, 0));
 
 // texture 2d with default texture. the default textures are: "white", "black", "gray", "red", "bump"
 _ExampleName ("Texture2D display name", 2D) = "red" {}
@@ -466,14 +556,14 @@ _ExampleName ("CubemapArray", CubeArray) = "" {}
 float4 result = _ExampleName.Sample(sampler_ExampleName, float4(dir, slice));
 float4 result = texCUBEARRAY(_ExampleName, float4(dir, slice));
 
-</code_c>
-<br/>
-<h3>Property Attributes</h3>
-Property Attributes are modifiers you can put on attributes to change their behaviour and look in the UI!<br/>
-<a href="https://docs.unity.cn/2021.1/Documentation/Manual/SL-Properties.html"> ShaderLab: defining material properties </a><br/>
-<a href="https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html"> MaterialPropertyDrawer </a><br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Property Attributes</h3>
+    Property Attributes are modifiers you can put on attributes to change their behaviour and look in the UI!<br />
+    <a href="https://docs.unity.cn/2021.1/Documentation/Manual/SL-Properties.html"> ShaderLab: defining material properties </a><br />
+    <a href="https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html"> MaterialPropertyDrawer </a><br />
+    <br />
+    <code_c>
 
 // makes it be gamma corrected??
 [Gamma]
@@ -500,15 +590,15 @@ _MainTex ("MainTex", 2D) = "black" {}
 _BumpTex ("MainTex", 2D) = "black" {}
 
 // header! shows up nicely
-[Header(A group of things!)]
+[Header("A group of things!")]
 _MyParameterHere ("_MyParameterHere", Float) = 0.0
 
 // adds a pow of 3.0 (or any number) to the value in the UI
-[PowerSlider(3.0)] 
+[PowerSlider(3.0)]
 _MyParameterHere ("_MyParameterHere", Range(0, 1)) = 0.0
 
 // makes the float slider snap to int values
-[IntRange] 
+[IntRange]
 _MyParameterHere ("_MyParameterHere", Range(0, 10)) = 0.0
 
 // adds some space between values
@@ -520,29 +610,29 @@ _MyParameterHere ("_MyParameterHere", Float) = 0.0
 _MyParameterHere ("_MyParameterHere", Float) = 0.0
 
 // turns bool into a checkbox toggle
-[Toggle] 
+[Toggle]
 _MyParameterHere ("_MyParameterHere", Float) = 0.0
 
 // makes an enum, like a dropdown, with specific with assigned values!
 // in the shader code, with this, you can do "Blend One _MyBlendValue"
 // This can be used to make things like blend mode, two-sided, etc configurable per instance!
-[Enum(One, 1, SrcAlpha, 5)] 
+[Enum(One, 1, SrcAlpha, 5)]
 _MyBlendValue ("_MyBlendValue", Float) = 0
 
 // same thing
-[Enum(UnityEngine.Rendering.BlendMode)] 
+[Enum(UnityEngine.Rendering.BlendMode)]
 _Blend ("Blend mode", Float) = 1
 
 // same thing, but for blend mode
-[KeywordEnum(Front, Back, None)] 
+[KeywordEnum(Front, Back, None)]
 _Cull ("Overlay mode", Float) = 1
 
-</code_c>
-<br/>
-<h3>Standard Names</h3>
-The unity standard shader has some standardized names for properties, use these if you want your shader fallback to look right!<br/>
-<br/>
-<code_c>
+    </code_c>
+    <br />
+    <h3>Standard Names</h3>
+    The unity standard shader has some standardized names for properties, use these if you want your shader fallback to look right!<br />
+    <br />
+    <code_c>
 _Color ("Color", Color) = (1, 1, 1, 1)
 _MainTex ("Albedo", 2D) = "white" { }
 
@@ -563,72 +653,79 @@ _OcclusionMap ("Occlusion", 2D) = "white" { }
 
 _EmissionColor ("Color", Color) = (0,0,0,1)
 _EmissionMap ("Emission", 2D) = "white" { }
-</code_c>
+    </code_c>
 
-<br/>
-<script>
-document.querySelectorAll("code_c").forEach(el => {
-  const esc = s => s.replace(/[&<>]/g, c => c == "&" ? "&amp;" : c == "<" ? "&lt;" : "&gt;");
-  const store = [];
+    <br />
+    <script>
+        document.querySelectorAll("code_c").forEach(el =>
+        {
+            const esc = s => s.replace(/[&<>]/g, c => c == "&" ? "&amp;" : c == "<" ? "&lt;" : "&gt;");
+            const store = [];
 
-  // 1) Protect strings & comments with tokens
-  let src = el.textContent.replace(
-    /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,
-    m => {
-      store.push(m);
-      return "__TOK" + (store.length - 1) + "__"; // <-- no \u here
-    }
-  );
+            // 1) Protect strings & comments with tokens
+            let src = el.textContent.replace(
+                /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,
+                m =>
+                {
+                    store.push(m);
+                    return "__TOK" + (store.length - 1) + "__"; // <-- no \u here
+                }
+            );
 
-  // 2) Escape HTML
-  src = esc(src);
+            // 2) Escape HTML
+            src = esc(src);
 
-  // 3) Split by tokens; highlight only non-token segments
-  const parts = src.split(/__TOK(\d+)__/); // <-- match our __TOKN__ markers
+            // 3) Split by tokens; highlight only non-token segments
+            const parts = src.split(/__TOK(\d+)__/); // <-- match our __TOKN__ markers
 
-  for (let i = 0; i < parts.length; i += 2) {
-    let s = parts[i];
-    s = s.replace(/(^|\n)(\s*#\s*\w+)/g, '$1<span class=pp>$2</span>');                               // preproc
-    s = s.replace(/(#\s*include\s+)&lt;([^&]+)&gt;/g, '$1<span class=hd>&lt;$2&gt;</span>');           // <header>
-    s = s.replace(/\b(0x[\da-fA-F]+|\d+(?:\.\d+)?(?:ll|LL|u|U|l|L|f|F)?)\b/g, '<span class=nu>$1</span>'); // numbers
-    s = s.replace(/\b(int|int2|int3|int4|char|float|float2|float3|float4|double|void|long|short|unsigned|signed|size_t|ssize_t|uint\d*_t|int\d*_t|bool)\b/g, '<span class=ty>$1</span>');
-    s = s.replace(/\b(if|else|for|while|do|switch|case|Blend|Ztest|ZWrite|Cull|default|break|continue|return|struct|typedef|enum|static|const|volatile|extern|register|goto|sizeof)\b/g, '<span class=kw>$1</span>');
-    parts[i] = s;
-  }
+            for (let i = 0; i < parts.length; i += 2)
+            {
+                let s = parts[i];
+                s = s.replace(/(^|\n)(\s*#\s*\w+)/g, '$1<span class=pp>$2</span>');                               // preproc
+                s = s.replace(/(#\s*include\s+)&lt;([^&]+)&gt;/g, '$1<span class=hd>&lt;$2&gt;</span>');           // <header>
+                s = s.replace(/\b(0x[\da-fA-F]+|\d+(?:\.\d+)?(?:ll|LL|u|U|l|L|f|F)?)\b/g, '<span class=nu>$1</span>'); // numbers
+                s = s.replace(/\b(int|int2|int3|int4|char|float|float2|float3|float4|sampler2D|SamplerState|Texture2D|double|void|long|short|unsigned|signed|size_t|ssize_t|uint\d*_t|int\d*_t|bool)\b/g, '<span class=ty>$1</span>');
+                s = s.replace(/\b(if|else|for|while|do|switch|case|Blend|ZTest|ZWrite|Cull|default|break|continue|return|struct|typedef|enum|static|const|volatile|extern|register|goto|sizeof)\b/g, '<span class=kw>$1</span>');
+                s = s.replace(/\b(tex2D|abs|UnityObjectToWorldNormal|sign|max|min|pow|normalize|UNITY_INITIALIZE_OUTPUT|mul|Sample|SampleLevel|SampleBias|SampleGrad|Load|tex2DARRAY|tex3D|texCUBE|texCUBEARRAY|Enum|Toggle|Space|IntRange|PowerSlider|tex2Dgrad|tex2Dbias|tex2Dlod|Range|2D|Color|Header|Float|NoScaleOffset|MainColor|HideInInspector|HDR|Gamma|KeywordEnum|dot|frac)\b/g, '<span class=fn>$1</span>');
+                parts[i] = s;
+            }
 
-  // 4) Rebuild while restoring protected chunks
-  let out = "";
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 0) {
-      out += parts[i];
-    } else {
-      const t = store[+parts[i]];
-      const cls = /^\/[/*]/.test(t) ? 'co' : 'st';
-      out += `<span class="${cls}">${esc(t)}</span>`;
-    }
-  }
+            // 4) Rebuild while restoring protected chunks
+            let out = "";
+            for (let i = 0; i < parts.length; i++)
+            {
+                if (i % 2 === 0)
+                {
+                    out += parts[i];
+                } else
+                {
+                    const t = store[+parts[i]];
+                    const cls = /^\/[/*]/.test(t) ? 'co' : 'st';
+                    out += `<span class="${cls}">${esc(t)}</span>`;
+                }
+            }
 
-  el.innerHTML = out.trim();
-});
-</script>
-
-
-
-
-
-<code>
+            el.innerHTML = out.trim();
+        });
+    </script>
 
 
-struct Input
-{
-    float3 viewDir;
-    float4 screenPos;
-    float3 worldPos;
-    float3 worldRefl;
-    float3 worldNormal;
-};
 
-</code>
+
+
+    <code>
+
+
+        struct Input
+        {
+        float3 viewDir;
+        float4 screenPos;
+        float3 worldPos;
+        float3 worldRefl;
+        float3 worldNormal;
+        };
+
+    </code>
 
 
 <pre>
@@ -685,8 +782,8 @@ Effects
     Flowmap
 	
 	</pre>
-	
-		</CustomCenter>
+
+</CustomCenter>
 		
 		<script src="/lightbox.js"></script>
 		
@@ -696,7 +793,7 @@ main();
         
             <hr/>
             <CustomCenter>
-                Last updated 2025-11-15<br/>
+                Last updated 2025-11-21<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
