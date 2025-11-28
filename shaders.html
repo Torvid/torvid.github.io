@@ -230,7 +230,7 @@ code_c{display:block;background:#1e1e1e;color:#dcdcdc;font:13px/1.5 monospace;pa
     <h2>Examples!</h2>
     <h3>Triplanar mapping for blockouts</h3>
     <code_c>
-Shader "LearnSurface/BoxGrid"
+Shader "LearnSurface/Triplanar"
 {
     Properties
     {
@@ -238,9 +238,9 @@ Shader "LearnSurface/BoxGrid"
         [NoScaleOffset] _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0, 1)) = 0.5
         _Metallic ("Metallic", Range(0, 1)) = 0.0
-        _Tiling ("_Tiling", Range(0, 1)) = 1.0
+        _Tiling ("_Tiling", Range(0, 10)) = 1.0
 
-        [PowerSlider(3.0)] _Sharpness ("_Sharpness", Range(10, 150)) = 1.0
+        [PowerSlider(3.0)] _BlendSharpness ("_BlendSharpness", Range(10, 150)) = 25.0
     }
     SubShader
     {
@@ -266,7 +266,7 @@ Shader "LearnSurface/BoxGrid"
         float _Glossiness;
         float _Metallic;
         float _Tiling;
-        float _Sharpness;
+        float _BlendSharpness;
 
         void vert(inout appdata_full app, out Input input)
         {
@@ -277,16 +277,16 @@ Shader "LearnSurface/BoxGrid"
 
         void surf(Input input, inout SurfaceOutputStandard o)
         {
-            float xDiff = tex2D(_MainTex, input.worldPos.zy * _Tiling * float2(sign(input.normal.x), 1)).r;
-            float yDiff = tex2D(_MainTex, input.worldPos.xz * _Tiling * float2(sign(input.normal.y), 1)).r;
-            float zDiff = tex2D(_MainTex, input.worldPos.xy * _Tiling * float2(-sign(input.normal.z), 1)).r;
-            float3 blendWeights = pow(abs(input.normal), _Sharpness.xxx);
+            float3 xDiff = tex2D(_MainTex, input.worldPos.zy * _Tiling * float2(sign(input.normal.x), 1));
+            float3 yDiff = tex2D(_MainTex, input.worldPos.xz * _Tiling * float2(sign(input.normal.y), 1));
+            float3 zDiff = tex2D(_MainTex, input.worldPos.xy * _Tiling * float2(-sign(input.normal.z), 1));
+            float3 blendWeights = pow(abs(input.normal), _BlendSharpness.xxx);
             blendWeights = blendWeights / (blendWeights.x + blendWeights.y + blendWeights.z);
-            blend = (xDiff * blendWeights.x) + (yDiff * blendWeights.y) + (zDiff * blendWeights.z);
+            float3 Color = (xDiff * blendWeights.x) + (yDiff * blendWeights.y) + (zDiff * blendWeights.z);
 
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Albedo = _Color.rgb * 2 + blend;
+            o.Albedo = Color * _Color.rgb;
             o.Occlusion = 1;
             o.Alpha = 1;
             o.Normal = float3(0, 0, 1);
@@ -535,10 +535,10 @@ _ExampleName ("Texture2D display name", 2D) = "red" {}
 
 // texture 2d array
 _ExampleName ("Texture2DArray display name", 2DArray) = "" {}
-sampler2DArray _ExampleName;
-float4 result = tex2DARRAY(_ExampleName, float3(uv, slice));
+UNITY_DECLARE_TEX2DARRAY(_ExampleName);
+float4 result = UNITY_SAMPLE_TEX2DARRAY(_ExampleName, float3(uv, slice));
 // Alternatively:
-Texture2D _ExampleName;
+Texture2DArray _ExampleName;
 SamplerState my_Trilinear_Aniso8_Repeat_sampler;
 float4 result = _ExampleName.Sample(my_Trilinear_Aniso8_Repeat_sampler, float3(uv, slice));
 
@@ -793,7 +793,7 @@ main();
         
             <hr/>
             <CustomCenter>
-                Last updated 2025-11-21<br/>
+                Last updated 2025-11-28<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
