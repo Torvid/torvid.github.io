@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+                <head>
+                    <title>Torvid</title>
+                    <meta property="og:image" content="http://www.torvid.net/content/syndra/v1/IMG_0546.jpg" />
+                    <meta property="og:title" content="Syndra LED Badge" />
+                    <meta property="og:site_name" content="torvid.net" />
+                    <meta property="og:description" content="Wacky LED badge projects by Torvid!" />
+
+                    <link rel="shortcut icon" href="/favicon.jpg" />
+                    <link rel="stylesheet" href="/styles.css">
+
+
+                    <!-- Global site tag (gtag.js) - Google Analytics -->
+                    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-61846769-2"></script>
+                    <script>
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+
+                      gtag('config', 'UA-61846769-2');
+                    </script>
+
+
+                </head>
+                <!--<script src="/functions.js"></script>-->
+                <body bgcolor="black">
+
+        
+                <CustomCenter>
+                    <!--<p>pw.torvid.vore<p>-->
+                    <h1>torvid.net</h1>
+                    <center>
+<navigation>
+                        &nbsp;<a href="/home" id = "MainLink">Home</a>&nbsp; &#8226;
+                        &nbsp;<a href="/games" id = "GamesLink">Games</a>&nbsp; &#8226;
+                        &nbsp;<a href="/gallery" id = "ImagesLink">Renders</a>&nbsp; &#8226;
+                        &nbsp;<a href="/commissions" id = "commissionsLink">Art Gallery</a>&nbsp; &#8226;
+                        &nbsp;<a href="/conventions" id = "conventionsLink">Furry Conventions</a>&nbsp;
+</navigation>
+                    </center>
+                    <br/>
+                </CustomCenter>
+            <hr/>
+            
+
+<link rel="stylesheet" href="/galleryStyle.css">
+<link rel="stylesheet" href="website/styles.css">
+<link rel="stylesheet" href="website/galleryStyle.css">
+
+<script type="text/javascript" src="/galleryScript.js"></script>
+  <style>
+    /*body { font-family: sans-serif; padding: 20px; background-color: dimgray }
+    textarea { font-family: sans-serif; padding: 20px; background-color: gray }*/
+    #drop { border: 2px dashed #999; padding: 40px; text-align: center; }
+    #drop.dragover { background: #eee; }
+    #drop2 { border: 2px dashed #999; padding: 40px; text-align: center; }
+    #drop2.dragover { background: #eee; }
+    #items .item { background: #333; padding: 10px; border-radius: 8px; margin: 10px 0; }
+    .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .meta { opacity: 0.85; }
+    
+  /*canvas { image-rendering: pixelated; border: 1px solid #ccc; }*/
+  </style>
+  
+
+<div style="max-width:65em; margin:auto;">
+<h1>Syndra LED Badge Version 2</h1>
+
+<img   style="max-height: 15em; margin:1em;" src="/content/syndra/v2/thumbnail1.jpg"></img>
+<video style="max-height: 15em; margin:1em;" autoplay loop muted> <source src="/content/syndra/v2/fluid2.mp4" type="video/mp4"></video>
+<br/>
+
+Version 2 of the LED badge, this time I made 7 of them! <br/>
+<a href="https://t.me/+TfdcFI-LFZ03NDc0">Telegram Group</a><br/>
+<br/>
+
+
+<h2>Overview</h2>
+<b>A: System Button</b><br/>
+<b>B: Power Switch</b><br/>
+<b>C: USB connector</b><br/>
+<b>D: Program Buttons A, B, C, D</b><br/>
+<img style="max-height: 15em; margin:1em;" src="/content/syndra/v2/buttons.jpg"></img><br/>
+
+
+<h2>Operation</h2>
+<b>How do I change program?</b><br/>
+Press the system button on the top left of the badge.<br/>
+<br/>
+<b>How do I change text?</b><br/>
+Plug the badge into a computer via the USB-C port, it should show up as a USB drive. Open 'settings.txt', and edit the text inside. You can also change the color here.<br/>
+<br/>
+<b>How do I change animations?</b><br/>
+Create an animation file with the utility below, then upload it to the badge Upload animation image by overwriting the 'data.bin' file inside. Resoltion must be 48x10, for one frame, 48x80 for 8 frames, etc.<br/>
+<br/>
+<b>How Factory Reset?</b><br/>
+Hold the system button while powering on the badge.<br/>
+<br/>
+
+
+<h2>Hardware</h2>
+STM32F411 microcontroller (~100MHz arm core, 64k ram, 512k flash)<br/>
+HC595 shift registers for display control<br/>
+Simple LED matrix display<br/><br/>
+3D-printed Plastic case files: <a href="/content/syndra/v2/SyndraV2.step">.STEP</a> <a href="/content/syndra/v2/SyndraV2.f3d">.f3d</a> <br/>
+Programming Jig: <a href="/content/syndra/v2/ProgrammingJig.step">.STEP</a> <a href="/content/syndra/v2/ProgrammingJig.f3d">.f3d</a> <br/>
+<!--STM32CubeIDE project files: (coming soon)<br/>-->
+EasyEDA files:  <a href="/content/syndra/v2/ProPrj_Syndra Version 2_2026-02-07.epro">.epro</a> <br/>
+
+<h3>Disassembly / Reassembly</h3>
+<video style="max-height: 15em; margin:1em;" controls muted> <source src="/content/syndra/v2/disassembly2.mp4" type="video/mp4"></video>
+<video style="max-height: 15em; margin:1em;" controls muted> <source src="/content/syndra/v2/reassembly2.mp4" type="video/mp4"></video><br/>
+<br/>
+WARNING! If you swap out the battery, I strongly reccomend use one with internal low-power shutoff! The microcontroller will shut itself off if it sees a battery voltage below 3.4v, but it's not guaranteed safety.
+
+<h2>Software</h2>
+<b>0: Scrolling Text</b><br/>
+<b>1: Interactive fluid simulation</b><br/>
+<b>2: Clips / Slideshow</b><br/>
+<b>3: Battery indicator and brightness control</b><br/>
+<b>4: WMP-esque visualizer</b><br/>
+<b>5: Maze pacman game</b><br/>
+<b>6: Tetris</b><br/>
+<b>7: LightCycles (pvp snake)</b><br/>
+<b>8: Jump game</b><br/>
+<b>9: Row Test</b><br/>
+
+<h2>Animation Tool</h2>
+
+  <div id="drop">Drop image file here</div>
+  
+<hr/>
+  <button id="downloadBin" type="button">Download data.bin</button>
+<span id="status"></span>
+
+<div id="items"></div>
+
+Example Files:
+<img src="/content/syndra/v2/testimage1.png">
+<img src="/content/syndra/v2/testimage2.png">
+<img src="/content/syndra/v2/testimage3.png">
+<br/><br/><br/>
+
+<b>Closing thoughts.</b>
+<br/>
+
+Working on this one felt alltogether more calm than v1. I was able to fix most of the really bad design issues and problems I had with v1.<br/>
+I've not measured how long the battery lasts, but I think it's at least a bit longer than the previous version.<br/><br/>
+
+<b>Some thoughts for what I'd want to improve for v3:</b><br/>
+maybe add haptics for the fluid? like solenoids that make it shake when it sloshes and splas<br/>
+Put a voltage divider to measure USB power manually myself so I don't have to ask the charger what's going on.<br/>
+
+Try two-sided
+  <script>
+    "use strict";
+
+    var DropEl = document.getElementById("drop");
+    var DropEl2 = document.getElementById("drop2");
+    var ItemsEl = document.getElementById("items");
+    var StatusEl = document.getElementById("status");
+    var DownloadBtn = document.getElementById("downloadBin");
+
+    var Entries = [];
+
+    function Entry(file, width, height, data)
+    {
+      this.File = file;
+      this.Width = width;
+      this.Height = height;
+      this.Data = data;
+      this.OneBit = false;
+      this.Fps = 5;
+      this.Mode = "slideshow"; // "animation" | "slideshow"
+    }
+
+    function CreateItemHtml(e, index)
+    {
+      return (
+        '<div class="item" data-index="' + index + '">' +
+          '<div class="row">' +
+            '<strong class="name">' + EscapeHtml(e.File.name) + '</strong>' +
+            '<button type="button" class="delete">Delete</button>' +
+          '</div>' +
+          '<div class="row">' +
+            '<label>Mode: ' +
+              '<select class="mode">' +
+                '<option value="animation"' + (e.Mode === "animation" ? " selected" : "") + '>Animation</option>' +
+                '<option value="slideshow"' + (e.Mode === "slideshow" ? " selected" : "") + '>Slide Show</option>' +
+              '</select>' +
+            '</label>' +
+          '</div>' +
+          '<div class="row">' +
+            '<label><input type="checkbox" class="onebit"' + (e.OneBit ? " checked" : "") + '> 1-bit color</label>' +
+            ((e.Mode === "animation") ? '<label>FPS: <input type="number" class="fps" min="1" max="60" step="1" value="' + e.Fps + '"></label>' : '') +
+            ((e.Mode === "slideshow") ? '<label>Hold Time: <input type="number" class="fps" min="1" max="60" step="1" value="' + e.Fps + '"></label>' : '') +
+          '</div>' +
+          '<div class="row"><span class="meta">' + GetMetaText(e) + '</span></div>' +
+          '<hr>' +
+        '</div>'
+      );
+    }
+
+    function EscapeHtml(s)
+    {
+      return String(s).replace(/[&<>"']/g, function (c)
+      {
+        return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c];
+      });
+    }
+	
+    function GetEntryBytes(e)
+    {
+		var bytes = BuildBinAsync();
+		
+      // Match your current accounting: "onebit" counts 1 byte per pixel (not 1 bit).
+      return (e.OneBit ? (e.Width * e.Height * 3) : (e.Width * e.Height * 4 * 3)) / 8;
+    }
+
+    function GetMetaText(e)
+    {
+      return GetEntryBytes(e) + " bytes (" + e.Width + "x" + e.Height + "x3)";
+    }
+
+    function Render()
+    {
+      var html = "";
+      var totalBytes = 0;
+
+      for (var i = 0; i < Entries.length; i++)
+      {
+        totalBytes += GetEntryBytes(Entries[i]);
+        html += CreateItemHtml(Entries[i], i);
+      }
+
+      ItemsEl.innerHTML = html;
+
+      var kb = Math.ceil(totalBytes / 1024);
+      StatusEl.textContent = kb + " / 32 KB";
+      StatusEl.style.color = (kb > 32) ? "red" : "var(--main-color)";
+      DownloadBtn.disabled = (kb > 32);
+    }
+
+    async function AddEntryAsync(file)
+    {
+      var bmp = await createImageBitmap(file);
+      var sizeX = bmp.width;
+      var sizeY = bmp.height;
+
+      if (sizeX !== 48 || (sizeY % 10) !== 0)
+      {
+        alert("dimensions must be 48 pixels wide and height needs to be a multiple of 10");
+        return;
+      }
+      
+      var ctx = new OffscreenCanvas(sizeX, sizeY).getContext("2d");
+      ctx.drawImage(bmp, 0, 0);
+      
+      var data = ctx.getImageData(0, 0, sizeX, sizeY).data;
+      var newData = []
+      
+      for (var y = 0; y < sizeY; y++)
+      {
+          for (var x = 0; x < sizeX; x++)
+          {
+              var i = (x + y * sizeX) * 4;
+            
+              var r = data[i]
+              var g = data[i+1]
+              var b = data[i+2]
+              var a = data[i+3]
+              newData.push(r)
+              newData.push(g)
+              newData.push(b)
+          }
+      }
+      
+      Entries.push(new Entry(file, sizeX, sizeY, newData));
+      Render();
+    }
+
+    function RemoveEntry(index)
+    {
+      if (index < 0 || index >= Entries.length) return;
+      Entries.splice(index, 1);
+      Render();
+    }
+
+    // ---------- UI events (kept minimal; no per-item handlers) ----------
+
+    ItemsEl.addEventListener("click", function (e)
+    {
+      var target = e.target;
+      if (!target || !(target instanceof Element)) return;
+
+      if (target.classList.contains("delete"))
+      {
+        var row = target.closest(".item");
+        if (!row) return;
+        RemoveEntry(parseInt(row.dataset.index, 10) | 0);
+      }
+    });
+
+    ItemsEl.addEventListener("change", function (e)
+    {
+      var target = e.target;
+      if (!target || !(target instanceof Element)) return;
+
+      var row = target.closest(".item");
+      if (!row) return;
+
+      var index = parseInt(row.dataset.index, 10) | 0;
+      var entry = Entries[index];
+      if (!entry) return;
+
+      if (target.classList.contains("mode"))
+      {
+        entry.Mode = target.value;
+      }
+      else if (target.classList.contains("onebit"))
+      {
+        entry.OneBit = !!target.checked;
+      }
+      else if (target.classList.contains("fps"))
+      {
+        var v = Number(target.value);
+        if (!Number.isFinite(v)) v = 5;
+        v = Math.max(1, Math.min(60, (v | 0)));
+        entry.Fps = v;
+        target.value = String(v);
+      }
+
+      Render();
+    });
+
+    DropEl.addEventListener("dragover", function (e) { e.preventDefault(); DropEl.classList.add("dragover"); });
+    DropEl.addEventListener("dragleave", function () { DropEl.classList.remove("dragover"); });
+    DropEl.addEventListener("drop", function (e)
+    {
+      e.preventDefault();
+      DropEl.classList.remove("dragover");
+      
+      for (var i = 0; i < e.dataTransfer.files.length; i++)
+      {
+        var file = e.dataTransfer.files[i];
+        if(!file) continue;
+        if(!file.type) continue;
+        if(file.type.indexOf("image/") !== 0) continue;
+        
+        AddEntryAsync(file);
+      }
+    });
+    
+	if(DropEl2)
+	{
+		DropEl2.addEventListener("dragover", function (e) { e.preventDefault(); DropEl2.classList.add("dragover"); });
+		DropEl2.addEventListener("dragleave", function () { DropEl2.classList.remove("dragover"); });
+		DropEl2.addEventListener("drop", function (e)
+		{
+		  e.preventDefault();
+		  DropEl2.classList.remove("dragover");
+		  TestAsync(e.dataTransfer.files[0]);
+		});
+	}
+    
+    function readU8(out)
+    {
+      return out.shift();
+    }
+
+    function setPixel(x,y,r,g,b)
+    {
+        const ctx = document.getElementById("c").getContext("2d");
+        const img = ctx.createImageData(1, 1);
+        img.data[0] = r;
+        img.data[1] = g;
+        img.data[2] = b;
+        img.data[3] = 255;
+        ctx.putImageData(img, x, y);
+    }
+
+    function getBit(byte, index)
+    {
+      return byte & (1 << index);
+    }
+    function getHigh4(byte)
+    {
+      return byte & 0xF0;
+    }
+    function getLow4(byte)
+    {
+      return (byte & 0x0F) << 4;
+    }
+
+    async function DrawEntity(data, entity, frame)
+    {
+      var stride = (48*10*3* (entity.oneBit?1:4))/8;
+
+      var byteOffset = stride * frame;
+	  
+      var R = 0;
+      var G = 0;
+      var B = 0;
+      var colorCounter = 0;
+      var idx = 0;
+      for (var i = stride*frame; i < stride*(frame+1); i++)
+      {
+        var byte = data[entity.data+i];
+        if(entity.oneBit)
+        {
+          for (var j = 0; j < 8; j++) // Byte
+          {
+            if(colorCounter == 0) R = getBit(byte, j) > 0 ? 255 : 0;
+            if(colorCounter == 1) G = getBit(byte, j) > 0 ? 255 : 0;
+            if(colorCounter == 2)
+            {
+              B = getBit(byte, j) > 0 ? 255 : 0;
+              setPixel(idx % 48, idx / 48, R, G, B);
+              idx++;
+            }
+            colorCounter++;
+            colorCounter %= 3;
+          }
+        }
+        else
+        {
+          for (var j = 0; j < 2; j++) // Byte
+          {
+            var result = 0
+            if(j==0) result = getLow4(byte)
+            if(j==1) result = getHigh4(byte)
+            
+            if(colorCounter == 0) R = result;
+            if(colorCounter == 1) G = result;
+            if(colorCounter == 2)
+            {
+              B = result;
+              setPixel(idx % 48, idx / 48, R, G, B);
+              idx++;
+            }
+            colorCounter++;
+            colorCounter %= 3;
+          }
+        }
+      }
+    }
+    
+    async function TestAsync(file)
+    {
+      var data = await file.arrayBuffer();
+      data = Array.from(new Uint8Array(data));
+      
+      var offset = 0;
+      var entryCount = data[offset++];
+      
+      var entries = []
+      for (var i = 0; i < entryCount; i++)
+      {
+        var entity = {}
+        
+        var oneBit = data[offset++];
+        var mode = data[offset++];
+        var fps = data[offset++];
+        var frameCount = data[offset++];
+      
+        entity.data = offset;
+        entity.oneBit = oneBit;
+        entity.frameSize = (48*10*3 * (oneBit?1:4)) / 8;
+        entity.dataSize = (48*10*3 * frameCount * (oneBit?1:4)) / 8;
+        entity.mode = mode;
+        entity.fps = fps;
+        entity.frameCount = frameCount;
+        
+        var byteCount = (48*10*3* frameCount * (oneBit?1:4)) / 8;
+        offset += byteCount;
+        console.log(entity)
+        entries.push(entity);
+      }
+      DrawEntity(data, entries[0], 0);
+      
+    }
+
+    function pushU8(out, v)
+    {
+      out.push(v & 0xFF);
+    }
+    
+    function pushChar(out, v)
+    {
+      out.push(v.charCodeAt(0) & 0xFF);
+    }
+
+  function ToNibbleFromByte(b)
+  {
+    return ((b & 0xFF) >>> 4) & 0x0F;
+  }
+  
+  function SetHigh4(v, byteValue)
+  {
+    var n = ToNibbleFromByte(byteValue);
+    return ((v & 0x0F) | (n << 4)) & 0xFF;
+  }
+  
+  function SetLow4(v, byteValue)
+  {
+    var n = ToNibbleFromByte(byteValue);
+    return ((v & 0xF0) | n) & 0xFF;
+  }
+  
+    function SetBit(v, bitIndex) // bitIndex 0..7, bitValue 0/1
+    {
+      return v | 1 << bitIndex;
+    }
+	
+    function BuildBinAsync()
+    {
+      const out = [];
+	  
+	  // header
+      pushChar(out, "B");
+      pushChar(out, "i");
+      pushChar(out, "n");
+      pushChar(out, "a");
+      pushChar(out, "r");
+      pushChar(out, "y");
+      pushChar(out, " ");
+      pushChar(out, "e");
+      pushChar(out, "n");
+      pushChar(out, "t");
+      pushChar(out, "r");
+      pushChar(out, "i");
+      pushChar(out, "e");
+      pushChar(out, "s");
+      pushChar(out, ":");
+	  
+      var entryCount = Math.min(Entries.length, 16);
+      
+      pushU8(out, entryCount);
+	  
+      for (var i = 0; i < entryCount; i++)
+      {
+        var e = Entries[i];
+
+        var oneBit = e.OneBit ? 1 : 0;
+        var mode = e.Mode === "animation" ? 1 : 0;
+        var fps = Math.max(1, Math.min(60, e.Fps));
+        
+        var bytes = new Uint8Array(e.Data);
+        var frameCount = e.Height/10;
+        
+        pushU8(out, oneBit);
+        pushU8(out, mode);
+        pushU8(out, fps);
+        pushU8(out, frameCount);
+        pushU8(out, 0); // reserved
+        pushU8(out, 0); // reserved
+        pushU8(out, 0); // reserved
+        pushU8(out, 0); // reserved
+
+        if(oneBit)
+        {
+          for (var k = 0; k < bytes.length;)
+          {
+            var newByte = 0
+            for (var j = 0; j < 8; j++)
+            {
+              if(bytes[k] > 127)
+                newByte = SetBit(newByte, j)
+              k++
+            }
+            pushU8(out, newByte);
+          }
+        }
+        else
+        {
+          for (var k = 0; k < bytes.length;)
+          {
+            var newByte = 0
+            for (var j = 0; j < 2; j++)
+            {
+              if(j==0)
+                newByte = SetLow4(newByte, bytes[k])
+              else
+                newByte = SetHigh4(newByte, bytes[k])
+              k++
+            }
+            pushU8(out, newByte);
+          }
+        }
+      }
+      return out;
+    }
+	
+    function DownloadBytes(bytes, filename)
+    {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "application/octet-stream" }));
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    DownloadBtn.addEventListener("click", async function ()
+    {
+        if (Entries.length === 0)
+        {
+          StatusEl.textContent = "Drop some images first.";
+          return;
+        }
+      
+        var bytes = BuildBinAsync();
+        DownloadBytes(bytes, "data.bin");
+        StatusEl.textContent = "Downloaded data.bin (" + bytes.length.toLocaleString() + " bytes)";
+    });
+
+    Render();
+  </script>
+
+
+        
+            <hr/>
+            <CustomCenter>
+                Last updated 2026-02-09<br/>
+                <br/>
+                If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
+                I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
+                If you just want updates and art: <a href="https://t.me/joinchat/AAAAAFa-5FbNAVDHbQvkUA">https://t.me/joinchat/AAAAAFa-5FbNAVDHbQvkUA</a> <br/>
+
+                web 1.0 never died
+                <br/>
+                <br/>
+            </CustomCenter>
+</body> 
+            </html>
