@@ -51,43 +51,40 @@
 <div style="max-width:65em; margin:auto;">
 <h1>Feather Bake</h1>
 
+This tool bakes NormalizedCrow's feather and fur shader to a normal unity mesh.<br/>
 
-<p>
-This tool bakes NormalizedCrow's feather and fur shader to a normal unity mesh.
-</p>
 
 <ul>
   <li>Looks and works very close to the unbaked shader.</li>
   <li>Improves GPU preformance by 2-5x.</li>
   <li>Makes it work in fallback.</li>
+  <li>Works with other shaders like poiyomi.</li>
 </ul>
 
-Drawbacks/Considerations before use:<br/>
+Drawbacks/considerations before use:<br/>
 <ul>
   <li>2-4x mesh file size.</li>
   <li>Feathers now eat into the VRC polygon budget.</li>
   <li>Extra bake step needed after grooming.</li>
 </ul>
+<br/>
+<img src="content/featherbake/baketool.png" style="max-width:30em;"></img><br/>
+<br/>
+If you encounter bugs with the tool, or something not working right, feel free to poke @Torvid on telegram ^^. I can't guarantee 100% availability, but making the tool less buggy would be nice.<br/>
 
-<p>
-If you encounter bugs with the tool, or something not working right, feel free to poke @Torvid on telegram ^^. I can't guarantee 100% availability, but making the tool less buggy would be nice.<br>
-</p>
 
 <h2>Download</h2>
-<a href="content/featherbake/FeathersAndFurBakeMeshV4.unitypackage">1. FeathersAndFurBakeMeshV4.unitypackage</a>
+<a href="content/featherbake/FeathersAndFurBakeMeshV5.unitypackage">FeathersAndFurBakeMeshV5.unitypackage</a>
 
-<p>
+
 <h2>Baking</h2>
-
 <ol>
-  <li>Import the package.</li>
   <li>In the top panel, Go to Tools->Torvid->FeathersAndFur Bake Mesh.</li>
-  <li>In the window, assign in your avatar's Skinned Mesh Renderer from the Scene.</li>
-  <li>Click "Bake Cards" (generates a copy of the mesh and a new material with the shader swapped)</li>
-  <li>Click "Assign Baked" (swaps out the mesh and material for the baked ones)</li>
+  <li>Assign in your avatar's Skinned Mesh Renderer from the Scene.</li>
+  <li>Click "Bake Cards" This generates a copy of the mesh and a new material with the shader swapped.</li>
+  <li>Click "Assign Baked". This swaps out the mesh and material for the baked ones.</li>
 </ol> 
 
-<p>
 <h2>FBX Export</h2>
 <ol>
   <li>In the top panel, Go to Tools->Torvid->Export FBX</li>
@@ -96,13 +93,67 @@ If you encounter bugs with the tool, or something not working right, feel free t
   <li>Click Export!</li>
 </ol>
 
-<h2>Quality</h2>
-<img src="content/featherbake/corporate.jpg" style="max-width:40em;"></img>
+<style>
+.imagelist img
+{
+	margin-bottom : 2em;
+}
+.imagelist li
+{
+	margin-bottom : 0.5em;
+}
+</style>
 
-<h2>Fallback</h2>
-<img src="content/featherbake/fallback.jpg" style="max-width:40em;"></img>
+<h2>poiyomi setup</h2>
+<ol class=imagelist>
+	<li>Set it to Cutout.</li>
+	<img src="content/featherbake/pioSetup0.png"></img>
+	<li>Assign the feather mask in Alpha Map.</li>
+	<img src="content/featherbake/pioSetup1.png"></img>
+	<li>Assign the base texture in Detail Texture and set it to UV1.</li>
+	<img src="content/featherbake/pioSetup2.png"></img>
+</ol>
 
-<h2>Performance</h2>
+<!--
+<h2>How to fix the poiyomi lighting</h2>
+<ol>
+	<li>Set shading->shading->lighting type to Realistic.</li>
+	<li>Set shading->light data->base pass->limit brightness to Off.</li>
+	<li>Set shading->light data->base pass->Recieve Casted Shadows to 1.</li>
+	<li>Set shading->light data->add pass->Ignore Directional Light to Off.</li>
+	<li>Set shading->light data->add pass->limit brightness to Off.</li>
+</ol>
+-->
+	
+
+
+<h2>Quality, Technical details</h2>
+<img src="content/featherbake/corporate.jpg" style="max-width:50em;"></img>
+
+<h3>Fallback</h3>
+<img src="content/featherbake/fallback.jpg" style="max-width:50em;"></img>
+
+
+<h3>How it works</h3>
+To extract the feathers, I modified the geometry shader so it outputs its data to a set of textures instead of drawing it to the screen like normal:<br/>
+
+<img src="content/featherbake/bakedata0.png" style="max-width:10em;"></img>
+<img src="content/featherbake/bakedata1.png" style="max-width:10em;"></img>
+<img src="content/featherbake/bakedata2.png" style="max-width:10em;"></img>
+<img src="content/featherbake/bakedata3.png" style="max-width:10em;"></img>
+<img src="content/featherbake/bakedata4.png" style="max-width:10em;"></img>
+<img src="content/featherbake/bakedata5.png" style="max-width:10em;"></img><br/><br/>
+
+These data-textures are then read-back to the CPU and used to generate the baked mesh.<br/>
+<br/>
+
+Barycentric coordinates for each feather is also extracted, so that skinning and blend shapes can be transferred. Basically each feather card knows exactly what triangle, and where on that triangle it sprouted from.<br/><br/>
+I tried really hard to get it to fall back with cutout and color correctly, but eventually gave up and let it fall back to VRChat's toonstandard.<br/><br/>
+The FBX exporter just calls into the one that comes with unity, so not much to say there really.<br/>
+<br/>
+
+
+<h3>Performance</h3>
 I did two tests, one close-up, and one further away.
 <br/>
 Hardware: RTX 3060<br/>
@@ -123,12 +174,11 @@ Test 2, Further away: 9.5ms -> 3.8ms (~2.5x faster)<br/>
 <br/>
 <br/>
 
-
 </div>
         
             <hr/>
             <CustomCenter>
-                Last updated 2026-03-11<br/>
+                Last updated 2026-03-18<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>
