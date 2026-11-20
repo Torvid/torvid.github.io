@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #test on python 3.4 ,python of lower version  has different module organization.
+import os
 import http.server
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import socketserver
@@ -12,12 +13,12 @@ class CORSRequestHandler (http.server.SimpleHTTPRequestHandler):
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
         self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
         http.server.SimpleHTTPRequestHandler.end_headers(self)
-        
+
     def do_GET(self):
-        if self.path.endswith("/"):
-            self.path = self.path[0:-1] + '.html'
+        path = self.path.split('?')[0].split('#')[0]
+        if not os.path.exists(self.translate_path(path)) and os.path.isfile(self.translate_path(path.rstrip('/') + '.html')):
+            self.path = path.rstrip('/') + '.html' + self.path[len(path):]
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
-        #return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
 Handler = CORSRequestHandler#http.server.SimpleHTTPRequestHandler
 

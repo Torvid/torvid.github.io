@@ -551,8 +551,8 @@ Shader "LearnSurface/Example"
         // int (float that pretends to be an integer)
         _ExampleInt ("Int display name", Int) = 1
 
-        // bool (see Material Property Attributes)
-        [Toggle] _ExampleToggle ("Float display name", Float) = 0.5
+        // bool (see Material Property Drawer)
+        [Toggle] _ExampleToggle ("Float display name", Float) = 0
     }
     SubShader
     {
@@ -576,7 +576,7 @@ Shader "LearnSurface/Example"
         // int (float that pretends to be an integer)
         float _ExampleInt;
         
-        // bool (see Material Property Attributes)
+        // bool (see Material Property Drawer)
         float _ExampleToggle;
         
         ENDCG
@@ -740,7 +740,7 @@ Shader "LearnSurface/Example"
         _BumpTex ("MainTex", 2D) = "black" {}
 
         // header! shows up nicely
-        [Header("A group of things!")]
+        [Header(A group of things!)]
         _MyParameterHere ("_MyParameterHere", Float) = 0.0
 
         // adds a pow of 3.0 (or any number) to the value in the UI
@@ -963,7 +963,7 @@ main();
         
             <hr/>
             <CustomCenter>
-                Last updated 2026-04-04<br/>
+                Last updated 2026-07-31<br/>
                 <br/>
                 If you let me get at you, it's only a matter of time before you end up under my paws or in my beak.<br/>
                 I am best reached on my Discord: <a href="https://discord.gg/ZQpTQYZ">https://discord.gg/ZQpTQYZ</a> <br/>

@@ -1,0 +1,963 @@
+abs - returns absolute value of scalars and vectors.
+# Description
+Returns the absolute value of a scalar or vector.
+For vectors, the returned vector contains the absolute value of each element of the input vector.
+# Reference Implementation
+abs for a float scalar could be implemented like this.
+float abs(float a)
+{
+  return max(-a, a);
+}
+
+acos - returns arccosine of scalars and vectors.
+# Description
+Returns the arccosine of a in the range [0,pi], expecting a to be in the range [-1,+1].
+For vectors, the returned vector contains the arccosine of each element of the input vector. 
+# Reference Implementation
+acos for a float scalar could be implemented like this.
+// Handbook of Mathematical Functions
+// M. Abramowitz and I.A. Stegun, Ed.
+// Absolute error <= 6.7e-5
+float acos(float x) {
+  float negate = float(x < 0);
+  x = abs(x);
+  float ret = -0.0187293;
+  ret = ret * x;
+  ret = ret + 0.0742610;
+  ret = ret * x;
+  ret = ret - 0.2121144;
+  ret = ret * x;
+  ret = ret + 1.5707288;
+  ret = ret * sqrt(1.0-x);
+  ret = ret - 2 * negate * ret;
+  return negate * 3.14159265358979 + ret;
+}
+
+all - returns true if a boolean scalar or all components of a boolean vector are true.
+# Description
+Returns true if a boolean scalar or all components of a boolean vector are true.
+# Reference Implementation
+all for a bool4 vector could be implemented like this.
+bool all(bool4 a)
+{
+  return a.x && a.y && a.z && a.w;
+}
+
+any - returns true if a boolean scalar or any component of a boolean vector is true.
+# Description
+Returns true if a boolean scalar or any component of a boolean vector is true.
+# Reference Implementation
+any for a bool4 vector could be implemented like this.
+bool any(bool4 a)
+{
+  return a.x || a.y || a.z || a.w;
+}
+
+asin - returns arcsine of scalars and vectors.
+# Description
+Returns the arcsine of a in the range [-pi/2,+pi/2], expecting a to be in the range [-1,+1].
+For vectors, the returned vector contains the arcsine of each element of the input vector. 
+# Reference Implementation
+asin for a float scalar could be implemented like this.
+// Handbook of Mathematical Functions
+// M. Abramowitz and I.A. Stegun, Ed.
+float asin(float x) {
+  float negate = float(x < 0);
+  x = abs(x);
+  float ret = -0.0187293;
+  ret *= x;
+  ret += 0.0742610;
+  ret *= x;
+  ret -= 0.2121144;
+  ret *= x;
+  ret += 1.5707288;
+  ret = 3.14159265358979*0.5 - sqrt(1.0 - x)*ret;
+  return ret - 2 * negate * ret;
+}
+
+atan - returns arctangent of scalars and vectors.
+# Description
+Returns the arctangent of x in the range of -pi/2 to pi/2 radians.
+For vectors, the returned vector contains the arctangent of each element of the input vector. 
+# Reference Implementation
+atan for a float scalar could be implemented like this.
+float atan(float x) {
+    return atan2(x, float(1));
+}
+atan2 is typically implemented as an approximation.
+
+atan2 - returns arctangent of scalars and vectors.
+# Description
+atan2 calculates the arctangent of y/x. atan2 is well defined for every point other than the origin, even if x equals 0 and y does not equal 0.
+For vectors, the returned vector contains the arctangent of each element of the input vector. 
+# Reference Implementation
+atan2 for a float2 scalar could be implemented as an approximation like this.
+float2 atan2(float2 y, float2 x)
+{
+  float2 t0, t1, t2, t3, t4;
+
+  t3 = abs(x);
+  t1 = abs(y);
+  t0 = max(t3, t1);
+  t1 = min(t3, t1);
+  t3 = float(1) / t0;
+  t3 = t1 * t3;
+
+  t4 = t3 * t3;
+  t0 =         - float(0.013480470);
+  t0 = t0 * t4 + float(0.057477314);
+  t0 = t0 * t4 - float(0.121239071);
+  t0 = t0 * t4 + float(0.195635925);
+  t0 = t0 * t4 - float(0.332994597);
+  t0 = t0 * t4 + float(0.999995630);
+  t3 = t0 * t3;
+
+  t3 = (abs(y) > abs(x)) ? float(1.570796327) - t3 : t3;
+  t3 = (x < 0) ?  float(3.141592654) - t3 : t3;
+  t3 = (y < 0) ? -t3 : t3;
+
+  return t3;
+}
+
+countbits - return the number of bits set in a bitfield.
+# Description
+Returns the count of set bits (value of 1) in the bitfield x.
+# Reference Implementation
+bitCount for an int bitfield can be implemented like this:
+int bitCount(int x)
+{
+  int i;
+  int res = 0;
+  for(i = 0; i < 32; i++) {
+    mask = 1 << i;
+    if (x & mask)
+      res ++;
+  }
+  return res;
+}
+
+ceil - returns smallest integer not less than a scalar or each vector component.
+# Description
+Returns the ceiling or smallest integer not less than a scalar or each vector component.
+# Reference Implementation
+ceil for a float scalar could be implemented like this.
+float ceil(float v)
+{
+  return -floor(-v);
+}
+
+clamp - returns smallest integer not less than a scalar or each vector component.
+# Description
+Returns x clamped to the range [a,b] as follows:
+    1) Returns a if x is less than a; else 
+    2) Returns b if x is greater than b; else 
+    3) Returns x otherwise. 
+For vectors, the returned vector contains the clamped result of each element of the vector x clamped using the respective element of vectors a and b. 
+# Reference Implementation
+clamp for float scalars could be implemented like this.
+float clamp(float x, float a, float b)
+{
+  return max(a, min(b, x));
+}
+
+clip - conditionally kill a pixel before output
+# Description
+kills the current pixel output if any component of the given vector, or the given scalar, is negative
+# Reference Implementation
+clip is equivalent to
+void clip(float4 x)
+{
+  if (any(x < 0))
+    discard;
+}
+
+cos - returns cosine of scalars and vectors.
+# Description
+Returns the cosine of a in radians. The return value is in the range [-1,+1].
+For vectors, the returned vector contains the cosine of each element of the input vector. 
+# Reference Implementation
+cos is best implemented as a native cosine instruction, however cos for a float scalar could be implemented by an approximation like this.
+cos(float a)
+{
+  /* C simulation gives a max absolute error of less than 1.8e-7 */
+  const float4 c0 = float4( 0.0,            0.5,
+                            1.0,            0.0            );
+  const float4 c1 = float4( 0.25,          -9.0,
+                            0.75,           0.159154943091 );
+  const float4 c2 = float4( 24.9808039603, -24.9808039603,
+                           -60.1458091736,  60.1458091736  );
+  const float4 c3 = float4( 85.4537887573, -85.4537887573,
+                           -64.9393539429,  64.9393539429  );
+  const float4 c4 = float4( 19.7392082214, -19.7392082214,
+                           -1.0,            1.0            );
+
+  /* r0.x = cos(a) */
+  float3 r0, r1, r2;
+
+  r1.x  = c1.w * a;                       // normalize input
+  r1.y  = frac( r1.x );                   // and extract fraction
+  r2.x  = (float) ( r1.y < c1.x );        // range check: 0.0 to 0.25
+  r2.yz = (float2) ( r1.yy >= c1.yz );    // range check: 0.75 to 1.0
+  r2.y  = dot( r2, c4.zwz );              // range check: 0.25 to 0.75
+  r0    = c0.xyz - r1.yyy;                // range centering
+  r0    = r0 * r0;
+  r1    = c2.xyx * r0 + c2.zwz;           // start power series
+  r1    =     r1 * r0 + c3.xyx;
+  r1    =     r1 * r0 + c3.zwz;
+  r1    =     r1 * r0 + c4.xyx;
+  r1    =     r1 * r0 + c4.zwz;
+  r0.x  = dot( r1, -r2 );                 // range extract
+
+  return r0.x;
+}
+
+cosh - returns hyperbolic cosine of scalars and vectors.
+# Description
+Returns the hyperbolic cosine of a.
+For vectors, the returned vector contains the hyperbolic cosine of each element of the input vector. 
+# Reference Implementation
+cosh for a scalar float could be implemented like this.
+float cosh(float x)
+{
+  return 0.5 * (exp(x)+exp(-x));
+}
+
+cross - returns the cross product of two three-component vectors
+# Description
+Returns the cross product of three-component vectors a and b. The result is a three-component vector. 
+# Reference Implementation
+cross for float3 vectors could be implemented this way:
+float3 cross(float3 a, float3 b)
+{
+  return a.yzx * b.zxy - a.zxy * b.yzx;
+}
+
+ddx - returns approximate partial derivative with respect to window-space X
+# Description
+Returns approximate partial derivative of a with respect to the window-space (horizontal) x coordinate.
+For vectors, the returned vector contains the approximate partial derivative of each element of the input vector.
+This function is only available in fragment program profiles (but not all of them).
+The specific way the partial derivative is computed is implementation-dependent. Typically fragments are rasterized in 2x2 arrangements of fragments (called quad-fragments) and the partial derivatives of a variable is computed by differencing with the adjacent horizontal fragment in the quad-fragment.
+The partial derivative computation may incorrect when ddx is used in control flow paths where not all the fragments within a quad-fragment have branched the same way.
+The partial derivative computation may be less exact (wobbly) when the variable is computed based on varying parameters interpolated with centroid interpolation. 
+# Reference Implementation
+ddx is not expressible in code but can be implemented on a texture by sampling one pixel to the right (or left) and subtracting it from the current pixel
+
+ddy - returns approximate partial derivative with respect to window-space Y
+# Description
+Returns approximate partial derivative of a with respect to the window-space (vertical) y coordinate.
+For vectors, the returned vector contains the approximate partial derivative of each element of the input vector.
+This function is only available in fragment program profiles (but not all of them).
+The specific way the partial derivative is computed is implementation-dependent. Typically fragments are rasterized in 2x2 arrangements of fragments (called quad-fragments) and the partial derivatives of a variable is computed by differencing with the adjacent horizontal fragment in the quad-fragment.
+The partial derivative computation may incorrect when ddy is used in control flow paths where not all the fragments within a quad-fragment have branched the same way.
+The partial derivative computation may be less exact (wobbly) when the variable is computed based on varying parameters interpolated with centroid interpolation. 
+# Reference Implementation
+ddy is not expressible in code but can be implemented on a texture by sampling one pixel to the right (or left) and subtracting it from the current pixel
+
+degrees - converts values of scalars and vectors from radians to degrees
+Description
+Returns the scalar or vector converted from radians to degrees.
+For vectors, the returned vector contains each element of the input vector converted from radians to degrees. 
+# Reference Implementation
+degrees for a float scalar could be implemented like this.
+float degrees(float a)
+{
+  return 57.29577951 * a;
+}
+
+determinant - return the scalar determinant of a square matrix
+# Description
+Returns the determinant of the square matrix A.
+# Reference Implementation
+The various determinant functions can be implemented like this:
+float determinant(float1x1 A)
+{
+  return A._m00;
+}
+float determinant(float2x2 A)
+{
+  return A._m00*A._m11 - A._m01*A._m10;
+}
+float determinant(float3x3 A)
+{
+  return dot(A._m00_m01_m02,
+             A._m11_m12_m10 * A._m22_m20_m21
+           - A._m12_m10_m11 * A._m21_m22_m20);
+}
+float determinant(float4x4 A) {
+  return dot(float4(1,-1,1,-1) * A._m00_m01_m02_m03,
+               A._m11_m12_m13_m10*(  A._m22_m23_m20_m21*A._m33_m30_m31_m32
+                                   - A._m23_m20_m21_m22*A._m32_m33_m30_m31)
+             + A._m12_m13_m10_m11*(  A._m23_m20_m21_m22*A._m31_m32_m33_m30
+                                   - A._m21_m22_m23_m20*A._m33_m30_m31_m32)
+             + A._m13_m10_m11_m12*(  A._m21_m22_m23_m20*A._m32_m33_m30_m31
+                                   - A._m22_m23_m20_m21*A._m31_m32_m33_m30));
+}
+
+distance - return the Euclidean distance between two points
+# Description
+Returns the Euclidean distance from a first point pt1 to a second point pt2. 
+# Reference Implementation
+distance for a float3 vector could be implemented like this.
+float distance(float3 pt1, float3 pt2)
+{
+  float3 v = vt2 - pt1;
+  return sqrt(dot(v,v));
+}
+
+dot - returns the scalar dot product of two vectors
+# Description
+Returns the scalar dot product of two same-typed vectors a and b.
+# Reference Implementation
+dot for float4 vectors could be implemented this way:
+float dot(float4 a, float4 b)
+{
+  return a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w;
+}
+
+exp - returns the base-e exponential of scalars and vectors
+# Description
+Returns the base-e exponential a.
+For vectors, the returned vector contains the base-e exponential of each element of the input vector. 
+# Reference Implementation
+float3 exp(float3 a)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = exp(a[i]);  // this is the ANSI C standard library exp()
+  }
+  return rv;
+}
+
+exp2 - returns the base-2 exponential of scalars and vectors
+# Description
+Returns the base-2 exponential a.
+For vectors, the returned vector contains the base-2 exponential of each element of the input vector. 
+# Reference Implementation
+float3 exp2(float3 a)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = exp2(a[i]);  // this is the ANSI C standard library exp2()
+  }
+  return rv;
+}
+
+faceforward - returns a normal as-is if a vertex's eye-space position vector points in the opposite direction of a geometric normal, otherwise return the negated version of the normal 
+# Description
+Returns a (peturbed) normal as-is if a vertex's eye-space position vector points in the opposite direction of a geometric normal, otherwise return the negated version of the (peturbed) normal
+Mathematically, if the dot product of I and Ng is negative, N is returned unchanged; otherwise -N is returned.
+This function is inspired by a RenderMan funciton of the same name though the RenderMan version has only two parameters. 
+# Reference Implementation
+faceforward for float3 vectors could be implemented this way:
+float3 faceforward( float3 N, float3 I, float Ng )
+{
+  return dot(I, Ng) < 0 ? N : -N;
+}
+
+asint - returns the 32-bit integer representation of an IEEE 754 floating-point scalar or vector
+# Description
+Returns a representation of the specified floating-point scalar value or vector values according to the IEEE 754 floating-point "single format" bit layout.
+Not-A-Number (NaN) floating-point values are cannonicalized to the integer value 0x7fc00000 regardless of the specific NaN encoding. The sign bit of the NaN is discarded.
+This function is based on Java's jave.lang.Float method of the same name. See:
+  http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Float.html
+#Reference Implementation
+asint operates consistent with the following ANSI C code:
+int asint(float  x)
+{
+  union {
+    float f;  // assuming 32-bit IEEE 754 single-precision
+    int i;    // assuming 32-bit 2's complement int
+  } u;
+
+  if (isnan(x)) {
+    return 0x7fc00000;
+  } else {
+    u.f = x;
+    return u.i;
+  }
+}
+
+floor - returns largest integer not greater than a scalar or each vector component.
+# Description
+Returns the floor or largest integer not greater than a scalar or each vector component.
+# Reference Implementation
+floor for a float3 vector could be implemented like this.
+float3 floor(float3 v)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = v[i] - frac(v[i]);
+  }
+  return rv;
+}
+
+fmod - returns the remainder of x/y with the same sign as x
+# Description
+fmod returns the remainder of x divided by y with the same sign as x. If y is zero, the result is implementation-defined because of division by zero.
+For vectors, the returned vector contains the signed remainder of each element of the input vector. 
+# Reference Implementation
+fmod for an float2 vector could be implemented as:
+float2 fmod(float2 a, float2 b)
+{
+  float2 c = frac(abs(a/b))*abs(b);
+  return (a < 0) ? -c : c;   /* if ( a < 0 ) c = 0-c */
+}
+
+frac - returns the fractional portion of a scalar or each vector component.
+# Description
+Returns the fractional portion of a scalar or each vector component.
+# Reference Implementation
+frac for a float scalar could be implemented like this.
+float frac(float v)
+{
+  return v - floor(v);
+}
+
+frexp - splits scalars and vectors into normalized fraction and a power of 2
+# Description
+This function decomposes x into two parts: a mantissa between 0.5 and 1 (returned by the function) and an exponent output as e.
+If the value x is zero, both parts of the result are zero.
+For vectors, the returned vector contains the mantissa of each element of the input vector and the output vector contains the exponent of each element of the input vector. 
+# Reference Implementation
+The example below is not legal Cg because it uses the & address-of operator not supported by Cg in order to call the ANSI C frexp routine.
+float3 frexp(float3 x, out float3 e)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    float eout;
+
+    rv[i] = frexp(a[i], &eout);  // this is the ANSI C standard library frexp()
+    e[i] = eout;
+  }
+  return rv;
+}
+
+fwidth - returns sum of approximate window-space partial derivatives magnitudes
+# Description
+Returns sum of the absolute values of each approximate partial derivative of a with respect to both the window-space (horizontal) x and (vertical) I<y) coordinate.
+For vectors, the returned vector contains the sum of partial derivative magnitudes of each element of the input vector.
+This function can be used to approximate the fragment width (hence the name "fwidth") for level-of-detail computations dependent on change in window-space.
+This function is only available in fragment program profiles (but not all of them).
+The specific way the partial derivative is computed is implementation-dependent. Typically fragments are rasterized in 2x2 arrangements of fragments (called quad-fragments) and the partial derivatives of a variable is computed by differencing with the adjacent horizontal fragment in the quad-fragment.
+The partial derivative computation may incorrect when fwidth is used in control flow paths where not all the fragments within a quad-fragment have branched the same way.
+The partial derivative computation may be less exact (wobbly) when the variable is computed based on varying parameters interpolated with centroid interpolation. 
+# Reference Implementation
+fmod for float3 vectors could be implemented this way:
+float3 fwidth(float3 a)
+{
+  return abs(ddx(a)) + abs(ddy(a));
+}
+
+asfloat - returns the float value corresponding to a given bit represention.of a scalar int value or vector of int values
+Description
+Returns the IEEE 754 float scalar value or vector values corresponding to a given 32-bit integer bit represention for a scalar int value or vector of int values.
+This function is based on Java's jave.lang.Float method of the same name. See:
+  http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Float.html
+The compiler can typically optimize asfloat so it has no instruction cost.
+
+Reference Implementation
+asfloat operates consistent with the following ANSI C code:
+float asfloat(int x)
+{
+  union {
+    float f;  // assuming 32-bit IEEE 754 single-precision
+    int i;    // assuming 32-bit 2's complement int
+  } u;
+
+  u.i = x;
+  return u.f;
+}
+
+inverse - return the inverse matrix of a matrix
+# Description
+Returns the inverse of the matrix A.
+# Reference Implementation
+inverse for a float2x2 matrix can be implemented like this:
+float2x2 inverse(float2x2 A)
+{
+  float2x2 C;
+
+  float det = determinant(A);
+  C[0] = A._m11;
+  C[1] = -A._m01;
+  C[2] = -A._m10;
+  C[3] = A._m00;
+
+  return C / det;
+}
+
+isfinite - test whether or not a scalar or each vector component is a finite value 
+# Description
+Returns whether or not a scalar or each vector component is a finite value. Infinity and not-a-number (NaN) values are not finite. 
+# Reference Implementation
+isfinite for float3 vectors could be implemented like this.
+bool3 isfinite(float3 s)
+{
+  // By IEEE 754 rule, 2*Inf equals Inf
+  return (s == s) && ((s == 0) || (s != 2*s));
+}
+
+isnan - test whether or not a scalar or each vector component is not-a-number 
+# Description
+Returns whether or not a scalar or each vector component is not-a-number (NaN) Finite and infinite values are not NaN. 
+# Reference Implementation
+isnan for float3 vectors could be implemented like this.
+bool3 isnan(float3 s)
+{
+  // By IEEE 754 rule, NaN is not equal to NaN
+  return s != s;
+}
+
+ldexp - returns x times 2 rained to n
+# Description
+ldexp returns x times 2 raised to the power n.
+# Reference Implementation
+ldexp for float2 vectors x and n could be implemented as:
+float2 ldexp(float2 x, float2 n)
+{
+  return x * exp2(n);
+}
+
+length - return scalar Euclidean length of a vector
+# Description
+Returns the Euclidean length of a vector.
+# Reference Implementation
+length for a float3 vector could be implemented like this.
+float length(float3 v)
+{
+  return sqrt(dot(v,v));
+}
+
+lerp - returns linear interpolation of two scalars or vectors based on a weight
+# Description
+Returns the linear interpolation of a and b based on weight w.
+a and b are either both scalars or both vectors of the same length. The weight w may be a scalar or a vector of the same length as a and b. w can be any value (so is not restricted to be between zero and one); if w has values outside the [0,1] range, it actually extrapolates.
+lerp returns a when w is zero and returns b when w is one.
+# Reference Implementation
+lerp for float3 vectors for a and b and a float w could be implemented like this:
+float3 lerp(float3 a, float3 b, float w)
+{
+  return a + w*(b-a);
+}
+
+log - returns the natural logarithm of scalars and vectors
+# Description
+Returns the natural logarithm a.
+For vectors, the returned vector contains the natural logarithm of each element of the input vector. 
+
+# Reference Implementation
+float3 log(float3 a)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = log(a[i]);  // this is the ANSI C standard library log()
+  }
+  return rv;
+}
+log is typically implemented with a native base-2 logarithm instruction.
+
+log10 - returns the base-10 logarithm of scalars and vectors
+# Description
+Returns the base-10 logarithm a.
+For vectors, the returned vector contains the base-10 logarithm of each element of the input vector. 
+# Reference Implementation
+float3 log10(float3 a)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = log10(a[i]);  // this is the ANSI C standard library log10()
+  }
+  return rv;
+}
+log10 is typically implemented with a native base-10 logarithm instruction.
+
+log2 - returns the base-2 logarithm of scalars and vectors
+# Description
+Returns the base-2 logarithm a.
+For vectors, the returned vector contains the base-2 logarithm of each element of the input vector.
+# Reference Implementation
+float3 log2(float3 a)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    rv[i] = log2(a[i]);  // this is the ANSI C standard library log2()
+  }
+  return rv;
+}
+
+max - returns the maximum of two scalars or each respective component of two vectors
+# Description
+Returns the maximum of two same-typed scalars a and b or the respective components of two same-typed vectors a and b. The result is a three-component vector. 
+# Reference Implementation
+max for float3 vectors could be implemented this way:
+float3 max(float3 a, float3 b)
+{
+  return float3(a.x > b.x ? a.x : b.x,
+                a.y > b.y ? a.y : b.y,
+                a.z > b.z ? a.z : b.z);
+}
+
+min - returns the minimum of two scalars or each respective component of two vectors
+# Description
+Returns the minimum of two same-typed scalars a and b or the respective components of two same-typed vectors a and b. The result is a three-component vector. 
+
+# Reference Implementation
+min for float3 vectors could be implemented this way:
+float3 min(float3 a, float3 b)
+{
+  return float3(a.x < b.x ? a.x : b.x,
+                a.y < b.y ? a.y : b.y,
+                a.z < b.z ? a.z : b.z);
+}
+
+
+modf - decompose a float into integer and fractional parts
+# Description
+modf returns the integer and fractional parts of x.
+# Reference Implementation
+
+mul - multiply a matrix by a column vector, row vector by a matrix, or matrix by a matrix
+# Description
+Returns the vector result of multiplying a matrix M by a column vector v; a row vector v by a matrix M; or a matrix A by a second matrix B.
+The following are algebrically equal (if not necessarily numerically equal):
+mul(M,v) == mul(v, tranpose(M))
+mul(v,M) == mul(tranpose(M), v)
+
+# Reference Implementation
+mul for a float4x3 matrix by a float3 column vector could be implemented this way:
+float4 mul(float4x3 M, float3 v)
+{
+  float4 r;
+
+  r.x = dot( M._m00_m01_m02, v );
+  r.y = dot( M._m10_m11_m12, v );
+  r.z = dot( M._m20_m21_m22, v );
+  r.w = dot( M._m30_m31_m32, v );
+
+  return r;
+}
+
+normalize - normalizes a vector
+# Description
+Returns the normalized version of a vector, meaning a vector in the same direction as the original vector but with a Euclidean length of one. 
+# Reference Implementation
+normalize for a float3 vector could be implemented like this.
+float3 normalize(float3 v)
+{
+  return rsqrt(dot(v,v))*v;
+}
+
+pow - returns x to the y-th power of scalars and vectors
+# Description
+Returns x to the power y.
+For vectors, the returned vector contains the power of each element of the base vector raised to the respective element of the exponent vector. 
+
+# Reference Implementation
+pow for float3 vectors could be implemented this way:
+float3 pow(float3 x, float3 y)
+{
+  float3 rv;
+
+  for (int i=0; i<3; i++) {
+    rv[i] = exp(x[i] * log(y[i]));
+  }
+  return rv;
+}
+
+radians - converts values of scalars and vectors from degrees to radians
+# Description
+Returns the scalar or vector converted from degrees to radians.
+For vectors, the returned vector contains each element of the input vector converted from degrees to radians. 
+
+# Reference Implementation
+radians for a float scalar could be implemented like this.
+float radians(float a)
+{
+  return 0.017453292 * a;
+}
+
+reflect - returns the reflectiton vector given an incidence vector and a normal vector.
+# Description
+Returns the reflectiton vector given an incidence vector i and a normal vector n. The resulting vector is the identical number of components as the two input vectors.
+The normal vector n should be normalized. If n is normalized, the output vector will have the same length as the input incidence vector i. 
+# Reference Implementation
+reflect for float3 vectors could be implemented this way:
+float3 reflect( float3 i, float3 n )
+{
+  return i - 2.0 * n * dot(n,i);
+}
+
+refract - computes a refraction vector.
+#Description
+Returns a refraction vector given an incidence vector, a normal vector for a surface, and a ratio of indices of refraction at the surface's interface.
+The incidence vector i and normal vector n should be normalized.
+#Reference Implementation
+reflect for float3 vectors could be implemented this way:
+float3 refract( float3 i, float3 n, float eta )
+{
+  float cosi = dot(-i, n);
+  float cost2 = 1.0f - eta * eta * (1.0f - cosi*cosi);
+  float3 t = eta*i + ((eta*cosi - sqrt(abs(cost2))) * n);
+  return t * (float3)(cost2 > 0);
+}
+
+round - returns the rounded value of scalars or vectors
+#Description
+Returns the rounded value of a scalar or vector.
+For vectors, the returned vector contains the rounded value of each element of the input vector.
+The round operation returns the nearest integer to the operand. The value returned by round() if the fractional portion of the operand is 0.5 is profile dependent. On older profiles without built-in round() support, round-to-nearest up rounding is used. On profiles newer than fp40/vp40, round-to-nearest even is used. 
+#Reference Implementation
+round for float could be implemented this way:
+// round-to-nearest even profiles
+float round(float a)
+{
+  float x = a + 0.5;
+  float f = floor(x);
+  float r;
+  if (x == f) {
+    if (a > 0)
+      r = f - fmod(f, 2);
+    else
+      r = f + fmod(f, 2);
+  } else
+    r = f;
+  return r;
+}
+// round-to-nearest up profiles
+float round(float a)
+{
+  return floor(x + 0.5);
+}
+
+rsqrt - returns reciprocal square root of scalars and vectors.
+#Description
+Returns an approximation to the reciprocal square root of a.
+For vectors, the returned vector contains the reciprocal square root of each element of the input vector.
+The reciprocal square root of zero is ideally infinity. The square root of negative values ideally returns NaN (Not a Number).
+# Reference Implementation
+rsqrt is best implemented as a native reciprocal square root instruction, however rsqrt may be implemented via a pow function:
+float3 rsqrt(float3 a)
+{
+  return pow(a, -0.5);
+}
+
+saturate - returns smallest integer not less than a scalar or each vector component.
+# Description
+Returns x saturated to the range [0,1] as follows:
+    1) Returns 0 if x is less than 0; else 
+    2) Returns 1 if x is greater than 1; else 
+    3) Returns x otherwise. 
+For vectors, the returned vector contains the saturated result of each element of the vector x saturated to [0,1].
+# Reference Implementation
+saturate for float scalars could be implemented like this.
+float saturate(float x)
+{
+  return max(0, min(1, x));
+}
+
+sign - returns sign of scalar or each vector component.
+# Description
+Returns positive one, zero, or negative one for each of the components of x based on the component's sign.
+    1) Returns -1 component if the respective component of x is negative. 
+    2) Returns 0 component if the respective component of x is zero. 
+    3) Returns 1 component if the respective component of x is positive. 
+    4) Ideally, NaN returns NaN. 
+# Reference Implementation
+sign for float3 could be implemented like this.
+float3 sign(float x)
+{
+  float3 val = a > 0;
+  return val - (a < 0);
+}
+
+sin - returns sine of scalars and vectors.
+# Description
+Returns the sine of a in radians. The return value is in the range [-1,+1].
+For vectors, the returned vector contains the sine of each element of the input vector.
+# Reference Implementation
+sin is best implemented as a native sine instruction, however sin for a float scalar could be implemented by an approximation like this.
+float sin(float a)
+{
+  /* C simulation gives a max absolute error of less than 1.8e-7 */
+  float4 c0 = float4( 0.0,            0.5,
+                      1.0,            0.0            );
+  float4 c1 = float4( 0.25,          -9.0,
+                      0.75,           0.159154943091 );
+  float4 c2 = float4( 24.9808039603, -24.9808039603,
+                     -60.1458091736,  60.1458091736  );
+  float4 c3 = float4( 85.4537887573, -85.4537887573,
+                     -64.9393539429,  64.9393539429  );
+  float4 c4 = float4( 19.7392082214, -19.7392082214,
+                     -1.0,            1.0            );
+
+  /* r0.x = sin(a) */
+  float3 r0, r1, r2;
+
+  r1.x  = c1.w * a - c1.x;                // only difference from cos!
+  r1.y  = frac( r1.x );                   // and extract fraction
+  r2.x  = (float) ( r1.y < c1.x );        // range check: 0.0 to 0.25
+  r2.yz = (float2) ( r1.yy >= c1.yz );    // range check: 0.75 to 1.0
+  r2.y  = dot( r2, c4.zwz );              // range check: 0.25 to 0.75
+  r0    = c0.xyz - r1.yyy;                // range centering
+  r0    = r0 * r0;
+  r1    = c2.xyx * r0 + c2.zwz;           // start power series
+  r1    =     r1 * r0 + c3.xyx;
+  r1    =     r1 * r0 + c3.zwz;
+  r1    =     r1 * r0 + c4.xyx;
+  r1    =     r1 * r0 + c4.zwz;
+  r0.x  = dot( r1, -r2 );                 // range extract
+
+  return r0.x;
+}
+
+sincos - returns sine of scalars and vectors.
+# Description
+Outputs to s the sine of a in radians, and outputs to c the cosine of a in radians. The output values are in the range [-1,+1].
+For vectors, the output vectors contains the sine or cosine respectively of each element of the input vector.
+# Reference Implementation
+sin is best implemented as a native sine instruction, however sin for a float scalar could be implemented by an approximation like this.
+void sincos(float3 a, out float3 s, float3 out c)
+{
+  int i;
+
+  for (i=0; i<3; i++) {
+    s[i] = sin(a[i]);
+    c[i] = cos(a[i]);
+  }
+}
+
+sinh - returns hyperbolic sine of scalars and vectors.
+# Description
+Returns the hyperbolic sine of a.
+For vectors, the returned vector contains the hyperbolic sine of each element of the input vector.
+# Reference Implementation
+sinh for a scalar float could be implemented like this.
+float sinh(float x)
+{
+  return 0.5 * (exp(x)-exp(-x));
+}
+smoothstep - interpolate smoothly between two input values based on a third
+# Description
+Interpolates smoothly from 0 to 1 based on x compared to a and b.
+    1) Returns 0 if x < a < b or x > a > b 
+    1) Returns 1 if x < b < a or x > b > a 
+    3) Returns a value in the range [0,1] for the domain [a,b]. 
+The slope of smoothstep(a,b,a) and smoothstep(a,b,b) is zero.
+For vectors, the returned vector contains the smooth interpolation of each element of the vector x.
+# Reference Implementation
+smoothstep for float scalars could be implemented this way:
+float smoothstep(float a, float b, float x)
+{
+    float t = saturate((x - a)/(b - a));
+    return t*t*(3.0 - (2.0*t));
+}
+
+sqrt - returns square root of scalars and vectors.
+# Description
+Returns the square root of a.
+For vectors, the returned vector contains the square root of each element of the input vector.
+The square root of zero is zero.
+Ideally, the square root of negative values returns NaN (Not a Number).
+sqrt often implemented as the reciprocal of a reciporcal squrare root approximation in older profiles.
+# Reference Implementation
+sqrt is best implemented as a native square root instruction, however sqrt may be implemented via a rsqrt function:
+float3 sqrt(float3 a)
+{
+  return 1.0 / rsqrt(a);
+}
+
+step - implement a step function returning either zero or one
+# Description
+Implements a step function returning one for each component of x that is greater than or equal to the corresponding component in the reference vector a, and zero otherwise.
+Reference Implementation
+step for float3 vectors could be implemented this way:
+float3 step(float3 a, float3 x)
+{
+  return x >= a;
+}
+
+tan - returns tangent of scalars and vectors.
+# Description
+Returns the tangent of a in radians.
+For vectors, the returned vector contains the tangent of each element of the input vector. 
+# Reference Implementation
+tan can be implemented in terms of the sin and cos functions like this:
+float tan(float a) {
+  float s, c;
+  sincos(a, s, c);
+  return s / c;
+}
+
+tanh - returns hyperbolic tangent of scalars and vectors.
+# Description
+Returns the hyperbolic tangent of a.
+For vectors, the returned vector contains the hyperbolic tangent of each element of the input vector.
+# Reference Implementation
+tanh for a scalar float could be implemented like this.
+float tanh(float x)
+{
+  float exp2x = exp(2*x);
+  return (exp2x - 1) / (exp2x + 1);
+}
+
+transpose - returns transpose matrix of a matrix
+# Description
+Returns the transpose of the matrix A.
+# Reference Implementation
+transpose for a float4x3 matrix can be implemented like this:
+float4x3 transpose(float3x4 A)
+{
+  float4x3 C;
+
+  C[0] = A._m00_m10_m20;
+  C[1] = A._m01_m11_m21;
+  C[2] = A._m02_m12_m22;
+  C[3] = A._m03_m13_m23;
+
+  return C;
+}
+
+trunc - returns largest integer not greater than a scalar or each vector component. 
+# Description
+Returns the integral value nearest to but no larger in magnitude than x.
+# Reference Implementation
+trunc for a float3 vector could be implemented like this.
+float3 trunc(float3 v)
+{
+  float3 rv;
+  int i;
+
+  for (i=0; i<3; i++) {
+    float x = v[i];
+
+    rv[i] = x < 0 ? -floor(-x) : floor(x);
+  }
+  return rv;
+}
+
+reversebits - Reverses the order of the bits, per component.
+# Description
+# Reference Implementation
+
+rcp - Calculates a fast, approximate, per-component reciprocal.
+# Description
+# Reference Implementation
+
+mad - Performs an arithmetic multiply/add operation on three values.
+# Description
+# Reference Implementation
